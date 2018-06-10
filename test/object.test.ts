@@ -115,4 +115,18 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// When && Then
     expect(actualObject.equalsForValues(ekvObject, paths)).toBeFalsy();
   });
+
+  it('Cloning with paths should work', () => {
+    /// Setup
+    let paths = ['a.a1_1.a2_1', 'd'];
+
+    /// When
+    let cloned = ekvObject.cloningForPaths(...paths);
+
+    /// Then
+    paths.forEach(v => expect(cloned.valueAtNode(v).value)
+      .toEqual(ekvObject.valueAtNode(v).value));
+
+    expect(cloned.valueAtNode('c').isFailure()).toBeTruthy();
+  });
 });

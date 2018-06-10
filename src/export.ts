@@ -1,4 +1,5 @@
 import './object+access';
+import './object+clone';
 import './object+equal';
 import './object+modify';
 export { builder, empty } from './object+utility';
