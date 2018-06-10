@@ -1,4 +1,4 @@
-import { JSObject, Nullable } from 'javascriptutilities';
+import { JSObject, Nullable, Try } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
 
@@ -9,6 +9,14 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     emptying(): Type;
+
+    /**
+     * Map the value at a certain path to another value.
+     * @param {string} path The path at which to map the value.
+     * @param {(value: Try<any>) => Try<any>} mapFn Mapping function.
+     * @returns {Type} A Type instance.
+     */
+    mappingValue(path: string, mapFn: (value: Try<any>) => Try<any>): Type;
 
     /**
      * Update value at a certain path.
@@ -56,7 +64,7 @@ Impl.prototype.emptying = function (): Type {
   return empty();
 };
 
-Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
+Impl.prototype.mappingValue = function (path: string, mapFn: (value: Try<any>) => Try<any>): Type {
   try {
     let subpaths = path.split(this._pathSeparator);
     let objectCopy = this.clonedObject;
@@ -64,13 +72,12 @@ Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Ty
 
     for (let i = 0, length = subpaths.length; i < length; i++) {
       let subpath = subpaths[i];
+      let intermediateValue = currentResult[subpath];
 
       if (i === length - 1) {
-        currentResult[subpath] = value;
+        currentResult[subpath] = mapFn(Try.unwrap(intermediateValue)).value;
         break;
       }
-
-      let intermediateValue = currentResult[subpath];
 
       if (
         intermediateValue === undefined ||
@@ -89,6 +96,10 @@ Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Ty
   } catch (e) {
     return this.cloneBuilder().build();
   }
+};
+
+Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
+  return this.mappingValue(path, () => Try.unwrap(value));
 };
 
 Impl.prototype.removingValue = function (path: string): Type {
