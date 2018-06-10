@@ -57,7 +57,7 @@ export class Builder implements BuilderType<Type> {
 
   public withObject(object: JSObject<any>) {
     if (object !== undefined && object !== null) {
-      this.object.setObject(object);
+      this.object.setObject(JSON.parse(JSON.stringify(object)));
     }
 
     return this;
@@ -73,9 +73,8 @@ export class Builder implements BuilderType<Type> {
 
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
-      return this
-        .withObject(buildable.clonedObject)
-        .withPathSeparator(buildable.pathSeparator);
+      this.object.setObject(buildable.clonedObject);
+      return this.withPathSeparator(buildable.pathSeparator);
     } else {
       return this;
     }
