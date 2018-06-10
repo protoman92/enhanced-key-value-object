@@ -17,6 +17,13 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     updatingValueAtNode(path: string, value: Nullable<any>): Type;
+
+    /**
+     * Remove value at a certain path.
+     * @param {string} path The path at which to remove value.
+     * @returns {Type} A Type instance.
+     */
+    removingValueAtNode(path: string): Type;
   }
 
   export interface Impl extends Type { }
@@ -60,4 +67,8 @@ Impl.prototype.updatingValueAtNode = function (path: string, value: Nullable<any
   }
 
   return this.cloneBuilder().withObject(objectCopy).build();
+};
+
+Impl.prototype.removingValueAtNode = function (path: string): Type {
+  return this.updatingValueAtNode(path, undefined);
 };

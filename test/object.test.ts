@@ -73,11 +73,13 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// When
     let ekvObject1 = ekvObject.updatingValueAtNode(path1, 1);
     let ekvObject2 = ekvObject.updatingValueAtNode(path2, [1, 2, 3]);
+    let ekvObject3 = ekvObject.removingValueAtNode('a.a1_1.a2_1');
 
     /// Then
     expect(ekvObject.object).toEqual(object);
     expect(ekvObject1.valueAtNode(path1).value).toBe(1);
     expect(ekvObject2.valueAtNode(path2).value).toEqual([1, 2, 3]);
+    expect(ekvObject3.valueAtNode('a.a1_1.a2_1').isFailure()).toBeTruthy();
   });
 
   it('Updating value path with thrown error should work correctly', () => {
