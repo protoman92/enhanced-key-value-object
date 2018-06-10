@@ -11,8 +11,8 @@ export interface Type extends BuildableType<Builder> {
 }
 
 export class Impl implements Type {
-  public _object: JSObject<any>;
-  public _pathSeparator: string;
+  private _object: JSObject<any>;
+  private _pathSeparator: string;
 
   public constructor() {
     this._object = {};

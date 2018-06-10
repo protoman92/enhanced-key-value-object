@@ -66,7 +66,7 @@ Impl.prototype.emptying = function (): Type {
 
 Impl.prototype.mappingValue = function (path: string, mapFn: (value: Try<any>) => Try<any>): Type {
   try {
-    let subpaths = path.split(this._pathSeparator);
+    let subpaths = path.split(this.pathSeparator);
     let objectCopy = this.clonedObject;
     let currentResult = objectCopy;
 
