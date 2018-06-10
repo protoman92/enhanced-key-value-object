@@ -1,5 +1,7 @@
 import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
 
+export type EKVObjectType = Type | JSObject<any>;
+
 export interface Type extends BuildableType<Builder> {
   readonly object: JSObject<any>;
   readonly pathSeparator: string;

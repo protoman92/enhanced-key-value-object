@@ -29,6 +29,7 @@
     "@types/jest": "^21.1.6",
     "@types/node": "^10.3.2",
     "coveralls": "^3.0.0",
+    "deep-equal": "^1.0.1",
     "jest": "^21.2.1",
     "ts-jest": "^21.2.3",
     "ts-mockito": "^2.3.0"

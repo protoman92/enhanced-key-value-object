@@ -1,4 +1,4 @@
-import { Builder, Type } from './object';
+import { Builder, EKVObjectType, Impl, Type } from './object';
 
 /**
  * Create a new builder object.
@@ -14,4 +14,17 @@ export function builder(): Builder {
  */
 export function empty(): Type {
   return builder().build();
+}
+
+/**
+ * Create an enhanced key-value object with an object.
+ * @param {EKVObjectType} object An EKVObjectType instance.
+ * @returns {Type} A Type instance.
+ */
+export function just(object: EKVObjectType): Type {
+  if (object instanceof Impl) {
+    return object;
+  } else {
+    return builder().withObject(object).build();
+  }
 }

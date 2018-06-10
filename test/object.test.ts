@@ -1,5 +1,6 @@
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
+let deepEqual = require('deep-equal');
 
 describe('Enhanced key-value object should be implemented correctly', () => {
   let object = {
@@ -90,5 +91,28 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 
     /// Then
     expect(ekvObject2).toBeTruthy();
+  });
+
+  it('Checking object equality for keys should work', () => {
+    /// Setup
+    let paths = ['a.a1_1.a2_1', 'a.a1_2', 'c', 'd.1.2.3', 'non_existent'];
+    let ekvObject1 = {};
+
+    /// When && Then
+    expect(ekvObject.equalsForValues(ekvObject, paths)).toBeTruthy();
+    expect(ekvObject.equalsForValues(ekvObject, paths, deepEqual)).toBeTruthy();
+    expect(ekvObject.equalsForValues(ekvObject, paths, () => { throw ''; })).toBeFalsy();
+    expect(ekvObject.equalsForValues(ekvObject1, paths, deepEqual)).toBeFalsy();
+  });
+
+  it('Checking equality with thrown error should work correctly', () => {
+    /// Setup
+    let paths = ['non_existent'];
+    let spiedObject = mockito.spy(ekvObject);
+    let actualObject = mockito.instance(spiedObject);
+    mockito.when(spiedObject.valueAtNode(mockito.anyString())).thenThrow(new Error(''));
+
+    /// When && Then
+    expect(actualObject.equalsForValues(ekvObject, paths)).toBeFalsy();
   });
 });
