@@ -42,7 +42,7 @@ Impl.prototype.emptying = function (): Type {
 
 Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
   let subpaths = path.split(this._pathSeparator);
-  let objectCopy = this.object;
+  let objectCopy = this.clonedObject;
   let currentResult = objectCopy;
 
   for (let i = 0, length = subpaths.length; i < length; i++) {
@@ -66,7 +66,6 @@ Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Ty
         currentResult[subpath] = intermediateValue;
       }
 
-      currentResult[subpath] = intermediateValue;
       currentResult = intermediateValue;
     } catch (e) {
       return this.cloneBuilder().build();
@@ -82,10 +81,10 @@ Impl.prototype.removingValue = function (path: string): Type {
 
 Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
   try {
-    let currentObject = this.object;
+    let currentObject = this.clonedObject;
     let newObject = Object.assign(currentObject, object);
     return this.cloneBuilder().withObject(newObject).build();
   } catch (e) {
-    return this;
+    return this.cloneBuilder().build();
   }
 };

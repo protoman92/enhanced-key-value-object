@@ -1,5 +1,6 @@
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
+import { Impl } from './../src/object';
 let deepEqual = require('deep-equal');
 
 describe('Enhanced key-value object should be implemented correctly', () => {
@@ -10,7 +11,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     d: 'd',
   };
 
-  let ekvObject: EKVObject.Type;
+  let ekvObject: Impl;
 
   beforeEach(() => {
     ekvObject = EKVObject.empty()
@@ -20,7 +21,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
       .withPathSeparator('.')
       .withPathSeparator(undefined as any)
       .withBuildable(undefined as any)
-      .build();
+      .build() as Impl;
   });
 
   it('Accessing empty path should work correctly', () => {
@@ -47,7 +48,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// Setup
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
-    mockito.when(spiedObject.object).thenReturn(undefined as any);
+    mockito.when(spiedObject.actualObject).thenReturn(undefined as any);
 
     /// When
     let accessedObject = actualObject.valueAtNode('d');
@@ -61,8 +62,8 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let emptied = ekvObject.emptying();
 
     /// When
-    expect(emptied.object).toEqual({});
-    expect(ekvObject.object).toEqual(object);
+    expect(emptied.clonedObject).toEqual({});
+    expect(ekvObject.clonedObject).toEqual(object);
   });
 
   it('Updating value path should work correctly', () => {
@@ -76,7 +77,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
 
     /// Then
-    expect(ekvObject.object).toEqual(object);
+    expect(ekvObject.clonedObject).toEqual(object);
     expect(ekvObject1.valueAtNode(path1).value).toBe(1);
     expect(ekvObject2.valueAtNode(path2).value).toEqual([1, 2, 3]);
     expect(ekvObject3.valueAtNode('a.a1_1.a2_1').isFailure()).toBeTruthy();
@@ -86,7 +87,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// Setup
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
-    mockito.when(spiedObject.object).thenReturn(undefined as any);
+    mockito.when(spiedObject.clonedObject).thenReturn(undefined as any);
 
     /// When
     let ekvObject2 = actualObject.updatingValue('a.b.c.d.e.f', undefined);
@@ -111,7 +112,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
     let otherObject = undefined;
-    mockito.when(spiedObject.object).thenThrow(new Error(''));
+    mockito.when(spiedObject.clonedObject).thenThrow(new Error(''));
 
     // When
     let updatedObject = actualObject.updatingValues(otherObject);

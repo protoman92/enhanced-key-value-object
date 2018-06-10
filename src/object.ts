@@ -3,7 +3,10 @@ import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
 export type EKVObjectType = Type | JSObject<any>;
 
 export interface Type extends BuildableType<Builder> {
-  readonly object: JSObject<any>;
+  /**
+   * Deep clone the inner object.
+   */
+  readonly clonedObject: JSObject<any>;
   readonly pathSeparator: string;
 }
 
@@ -16,8 +19,12 @@ export class Impl implements Type {
     this._pathSeparator = '.';
   }
 
-  public get object(): JSObject<any> {
-    return Object.assign({}, this._object);
+  public get actualObject(): JSObject<any> {
+    return this._object;
+  }
+
+  public get clonedObject(): JSObject<any> {
+    return JSON.parse(JSON.stringify(this._object));
   }
 
   public get pathSeparator(): string {
@@ -67,7 +74,7 @@ export class Builder implements BuilderType<Type> {
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
       return this
-        .withObject(buildable.object)
+        .withObject(buildable.clonedObject)
         .withPathSeparator(buildable.pathSeparator);
     } else {
       return this;

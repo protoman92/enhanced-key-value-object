@@ -37,7 +37,7 @@ declare module './object' {
 
 Impl.prototype.valueAtNode = function (path: string): Try<any> {
   let subpaths = path.split(this._pathSeparator);
-  let currentResult = this.object;
+  let currentResult = this.actualObject;
 
   for (let subpath of subpaths) {
     try {
