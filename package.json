@@ -1,7 +1,7 @@
 {
   "name": "enhanced-key-value-object",
   "version": "1.0.0",
-  "description": "Enhanced key value object.",
+  "description": "Enhanced key value object that supports safe access and modification.",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "typings": "./dist/src/index.d.ts",
