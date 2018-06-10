@@ -31,6 +31,22 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     updatingValues(object: Nullable<JSObject<any>>): Type;
+
+    /**
+     * Copy value from one node to another.
+     * @param {string} src The source path.
+     * @param {string} dest The destination path.
+     * @returns {Type<T>} A Type instance.
+     */
+    copyingValue(src: string, dest: string): Type;
+
+    /**
+     * Move value from one node to another.
+     * @param {string} src The source path.
+     * @param {string} dest The destination path.
+     * @returns {Type<T>} A Type instance.
+     */
+    movingValue(src: string, dest: string): Type;
   }
 
   export interface Impl extends Type { }
@@ -41,12 +57,12 @@ Impl.prototype.emptying = function (): Type {
 };
 
 Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
-  let subpaths = path.split(this._pathSeparator);
-  let objectCopy = this.clonedObject;
-  let currentResult = objectCopy;
+  try {
+    let subpaths = path.split(this._pathSeparator);
+    let objectCopy = this.clonedObject;
+    let currentResult = objectCopy;
 
-  for (let i = 0, length = subpaths.length; i < length; i++) {
-    try {
+    for (let i = 0, length = subpaths.length; i < length; i++) {
       let subpath = subpaths[i];
 
       if (i === length - 1) {
@@ -67,12 +83,12 @@ Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Ty
       }
 
       currentResult = intermediateValue;
-    } catch (e) {
-      return this.cloneBuilder().build();
     }
-  }
 
-  return this.cloneBuilder().withObject(objectCopy).build();
+    return this.cloneBuilder().withObject(objectCopy).build();
+  } catch (e) {
+    return this.cloneBuilder().build();
+  }
 };
 
 Impl.prototype.removingValue = function (path: string): Type {
@@ -82,9 +98,19 @@ Impl.prototype.removingValue = function (path: string): Type {
 Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
   try {
     let currentObject = this.clonedObject;
-    let newObject = Object.assign(currentObject, object);
+    let deepCloned = JSON.parse(JSON.stringify(object));
+    let newObject = Object.assign(currentObject, deepCloned);
     return this.cloneBuilder().withObject(newObject).build();
   } catch (e) {
     return this.cloneBuilder().build();
   }
+};
+
+Impl.prototype.copyingValue = function (src: string, dest: string): Type {
+  let sourceValue = this.valueAtNode(src);
+  return this.updatingValue(dest, sourceValue.value);
+};
+
+Impl.prototype.movingValue = function (src: string, dest: string): Type {
+  return this.copyingValue(src, dest).removingValue(src);
 };

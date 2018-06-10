@@ -113,6 +113,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let actualObject = mockito.instance(spiedObject);
     let otherObject = undefined;
     mockito.when(spiedObject.clonedObject).thenThrow(new Error(''));
+    mockito.when(spiedObject.cloneBuilder()).thenReturn(EKVObject.builder());
 
     // When
     let updatedObject = actualObject.updatingValues(otherObject);
@@ -156,5 +157,22 @@ describe('Enhanced key-value object should be implemented correctly', () => {
       .toEqual(ekvObject.valueAtNode(v).value));
 
     expect(cloned.valueAtNode('c').isFailure()).toBeTruthy();
+  });
+
+  it('Copying and moving values should work correctly', () => {
+    /// Setup
+    let sourcePath = 'a.a1_1.a2_1';
+    let destPath = 'non_existent.non_existent_1';
+    ekvObject = ekvObject.updatingValue(sourcePath, 1) as Impl;
+
+    /// When
+    let ekvObject1 = ekvObject.copyingValue(sourcePath, destPath);
+    let ekvObject2 = ekvObject.movingValue(sourcePath, destPath);
+
+    /// Then
+    expect(ekvObject1.valueAtNode(sourcePath).value).toBe(1);
+    expect(ekvObject1.valueAtNode(destPath).value).toBe(1);
+    expect(ekvObject2.valueAtNode(sourcePath).isFailure()).toBeTruthy();
+    expect(ekvObject2.valueAtNode(destPath).value).toBe(1);
   });
 });
