@@ -16,14 +16,14 @@ declare module './object' {
      * @param {Nullable<any>} value Any value.
      * @returns {Type} A Type instance.
      */
-    updatingValueAtNode(path: string, value: Nullable<any>): Type;
+    updatingValue(path: string, value: Nullable<any>): Type;
 
     /**
      * Remove value at a certain path.
      * @param {string} path The path at which to remove value.
      * @returns {Type} A Type instance.
      */
-    removingValueAtNode(path: string): Type;
+    removingValue(path: string): Type;
 
     /**
      * Update values from some object.
@@ -40,7 +40,7 @@ Impl.prototype.emptying = function (): Type {
   return empty();
 };
 
-Impl.prototype.updatingValueAtNode = function (path: string, value: Nullable<any>): Type {
+Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
   let subpaths = path.split(this._pathSeparator);
   let objectCopy = this.object;
   let currentResult = objectCopy;
@@ -76,8 +76,8 @@ Impl.prototype.updatingValueAtNode = function (path: string, value: Nullable<any
   return this.cloneBuilder().withObject(objectCopy).build();
 };
 
-Impl.prototype.removingValueAtNode = function (path: string): Type {
-  return this.updatingValueAtNode(path, undefined);
+Impl.prototype.removingValue = function (path: string): Type {
+  return this.updatingValue(path, undefined);
 };
 
 Impl.prototype.updatingValues = function (object: JSObject<any>): Type {

@@ -18,7 +18,7 @@ Impl.prototype.cloningForPaths = function (...paths: string[]): Type {
   let cloned = empty();
 
   paths.forEach(v => this.valueAtNode(v)
-    .doOnNext(v1 => cloned = cloned.updatingValueAtNode(v, v1)));
+    .doOnNext(v1 => cloned = cloned.updatingValue(v, v1)));
 
   return cloned;
 };

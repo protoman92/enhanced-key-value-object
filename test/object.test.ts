@@ -71,9 +71,9 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let path2 = 'a.a1_1.a2_4.a3_1.non_exitent.';
 
     /// When
-    let ekvObject1 = ekvObject.updatingValueAtNode(path1, 1);
-    let ekvObject2 = ekvObject.updatingValueAtNode(path2, [1, 2, 3]);
-    let ekvObject3 = ekvObject.removingValueAtNode('a.a1_1.a2_1');
+    let ekvObject1 = ekvObject.updatingValue(path1, 1);
+    let ekvObject2 = ekvObject.updatingValue(path2, [1, 2, 3]);
+    let ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
 
     /// Then
     expect(ekvObject.object).toEqual(object);
@@ -89,7 +89,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     mockito.when(spiedObject.object).thenReturn(undefined as any);
 
     /// When
-    let ekvObject2 = actualObject.updatingValueAtNode('a.b.c.d.e.f', undefined);
+    let ekvObject2 = actualObject.updatingValue('a.b.c.d.e.f', undefined);
 
     /// Then
     expect(ekvObject2).toBeTruthy();
