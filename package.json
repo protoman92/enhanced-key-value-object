@@ -1,0 +1,37 @@
+{
+  "name": "enhanced-key-value-object",
+  "version": "1.0.0",
+  "description": "Enhanced key value object.",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "typings": "./dist/src/index.d.ts",
+  "scripts": {
+    "setup": "npm install",
+    "build": "tsc",
+    "test": "tsc && jest --coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/protoman92/enhanced-key-value-object.git"
+  },
+  "keywords": [
+    "key",
+    "value"
+  ],
+  "author": "Hai Pham",
+  "license": "MIT",
+  "dependencies": {
+    "javascriptutilities": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/deep-equal": "^1.0.1",
+    "@types/jest": "^21.1.6",
+    "@types/node": "^10.3.2",
+    "coveralls": "^3.0.0",
+    "deep-equal": "^1.0.1",
+    "jest": "^21.2.1",
+    "ts-jest": "^21.2.3",
+    "ts-mockito": "^2.3.0"
+  }
+}
