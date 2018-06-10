@@ -95,6 +95,31 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(ekvObject2).toBeTruthy();
   });
 
+  it('Updating with external object should work', () => {
+    /// Setup
+    let otherObject = { e: { f: { g: 1 } } };
+
+    /// When
+    let updatedObject = ekvObject.updatingValues(otherObject);
+
+    /// Then
+    expect(updatedObject.valueAtNode('e.f.g').value).toBe(1);
+  });
+
+  it('Updating with external object and thrown error should work', () => {
+    /// Setup
+    let spiedObject = mockito.spy(ekvObject);
+    let actualObject = mockito.instance(spiedObject);
+    let otherObject = undefined;
+    mockito.when(spiedObject.object).thenThrow(new Error(''));
+
+    // When
+    let updatedObject = actualObject.updatingValues(otherObject);
+
+    /// Then
+    expect(updatedObject).toBeTruthy();
+  });
+
   it('Checking object equality for keys should work', () => {
     /// Setup
     let paths = ['a.a1_1.a2_1', 'a.a1_2', 'c', 'd.1.2.3', 'non_existent'];

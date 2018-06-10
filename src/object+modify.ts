@@ -1,4 +1,4 @@
-import { Nullable } from 'javascriptutilities';
+import { JSObject, Nullable } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
 
@@ -24,6 +24,13 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     removingValueAtNode(path: string): Type;
+
+    /**
+     * Update values from some object.
+     * @param {Nullable<JSObject<any>>} object A JSObject instance.
+     * @returns {Type} A Type instance.
+     */
+    updatingValues(object: Nullable<JSObject<any>>): Type;
   }
 
   export interface Impl extends Type { }
@@ -71,4 +78,14 @@ Impl.prototype.updatingValueAtNode = function (path: string, value: Nullable<any
 
 Impl.prototype.removingValueAtNode = function (path: string): Type {
   return this.updatingValueAtNode(path, undefined);
+};
+
+Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
+  try {
+    let currentObject = this.object;
+    let newObject = Object.assign(currentObject, object);
+    return this.cloneBuilder().withObject(newObject).build();
+  } catch (e) {
+    return this;
+  }
 };
