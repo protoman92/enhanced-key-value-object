@@ -104,18 +104,25 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
       if (
         interValue === undefined ||
         interValue === null ||
-        !Object.isExtensible(interValue) ||
-        interValue instanceof Array
+        !Object.isExtensible(interValue)
       ) {
         interValue = {};
-        currentResult[subpath] = interValue;
+      } else {
+        /**
+         * If an object exists at this path, shallow clone it to remove the
+         * reference pointing to said object. This means many EKVObjects may
+         * share the same references to some inner objects, but every time we
+         * update at those paths we clone these to avoid state sharing.
+         */
+        interValue = Object.assign({}, interValue);
       }
 
+      currentResult[subpath] = interValue;
       currentResult = interValue;
     }
 
     return new Impl()
-      .vopyingPropertiesUnsafely(this)
+      .copyingPropertiesUnsafely(this)
       .settingObjectUnsafely(objectCopy);
   } catch (e) {
     return this.cloneBuilder().build() as Impl;
@@ -123,7 +130,7 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
 };
 
 Impl.prototype.mappingValue = function (path: string, mapFn: EKVMapFn): Type {
-  return this._mappingValue(this.clonedObject, path, mapFn);
+  return this._mappingValue(this.shallowClonedObject, path, mapFn);
 };
 
 Impl.prototype._updatingValue = function (object: JSObject<any>, path: string, value: Nullable<any>): Impl {
@@ -140,12 +147,12 @@ Impl.prototype.removingValue = function (path: string): Type {
 
 Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
   try {
-    let currentObject = this.clonedObject;
-    let deepCloned = JSON.parse(JSON.stringify(object));
-    let newObject = Object.assign(currentObject, deepCloned);
+    let currentObject = this;
+    let clonedTarget = JSON.parse(JSON.stringify(object));
+    let newObject = Object.assign(currentObject, clonedTarget);
 
     return new Impl()
-      .vopyingPropertiesUnsafely(this)
+      .copyingPropertiesUnsafely(this)
       .settingObjectUnsafely(newObject);
   } catch (e) {
     return this.cloneBuilder().build();

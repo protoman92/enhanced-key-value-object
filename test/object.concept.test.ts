@@ -62,8 +62,8 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let emptied = ekvObject.emptying();
 
     /// When
-    expect(emptied.clonedObject).toEqual({});
-    expect(ekvObject.clonedObject).toEqual(object);
+    expect(emptied.deepClonedObject).toEqual({});
+    expect(ekvObject.deepClonedObject).toEqual(object);
   });
 
   it('Updating value path should work correctly', () => {
@@ -77,7 +77,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
 
     /// Then
-    expect(ekvObject.clonedObject).toEqual(object);
+    expect(ekvObject.deepClonedObject).toEqual(object);
     expect(ekvObject1.valueAtNode(path1).value).toBe(1);
     expect(ekvObject2.valueAtNode(path2).value).toEqual([1, 2, 3]);
     expect(ekvObject3.valueAtNode('a.a1_1.a2_1').isFailure()).toBeTruthy();
@@ -87,7 +87,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// Setup
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
-    mockito.when(spiedObject.clonedObject).thenReturn(undefined as any);
+    mockito.when(spiedObject.shallowClonedObject).thenReturn(undefined as any);
 
     /// When
     let ekvObject2 = actualObject.updatingValue('a.b.c.d.e.f', undefined);
@@ -112,7 +112,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
     let otherObject = undefined;
-    mockito.when(spiedObject.clonedObject).thenThrow(new Error(''));
+    mockito.when(spiedObject.deepClonedObject).thenThrow(new Error(''));
     mockito.when(spiedObject.cloneBuilder()).thenReturn(EKVObject.builder());
 
     // When
@@ -187,6 +187,6 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(EKVObject.just(possibleObject1).valueAtNode('a').isFailure()).toBeTruthy();
     expect(EKVObject.just(possibleObject2).valueAtNode('a').isFailure()).toBeTruthy();
     expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(innerObject.a);
-    expect(EKVObject.just(undefined).clonedObject).toEqual({});
+    expect(EKVObject.just(undefined).deepClonedObject).toEqual({});
   });
 });

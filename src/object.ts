@@ -8,7 +8,7 @@ export interface Type extends BuildableType<Builder> {
   /**
    * Deep clone the inner object.
    */
-  readonly clonedObject: JSObject<any>;
+  readonly deepClonedObject: JSObject<any>;
   readonly pathSeparator: string;
 }
 
@@ -25,7 +25,11 @@ export class Impl implements Type {
     return this._object;
   }
 
-  public get clonedObject(): JSObject<any> {
+  public get shallowClonedObject(): JSObject<any> {
+    return Object.assign({}, this._object);
+  }
+
+  public get deepClonedObject(): JSObject<any> {
     return JSON.parse(JSON.stringify(this._object));
   }
 
@@ -51,7 +55,7 @@ export class Impl implements Type {
     return this;
   }
 
-  public vopyingPropertiesUnsafely(ekvObject: Impl) {
+  public copyingPropertiesUnsafely(ekvObject: Impl) {
     return this
       .settingObjectUnsafely(ekvObject._object)
       .settingPathSeparatorUnsafely(ekvObject._pathSeparator);
@@ -83,7 +87,7 @@ export class Builder implements BuilderType<Type> {
 
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
-      this.object.settingObjectUnsafely(buildable.clonedObject);
+      this.object.settingObjectUnsafely(buildable.deepClonedObject);
       return this.withPathSeparator(buildable.pathSeparator);
     } else {
       return this;
