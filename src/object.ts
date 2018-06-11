@@ -1,6 +1,8 @@
 import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
 
 export type EKVObjectType = Type | JSObject<any>;
+export let objectKey: keyof Impl = '_object';
+export let pathSeparatorKey: keyof Impl = '_pathSeparator';
 
 export interface Type extends BuildableType<Builder> {
   /**
@@ -11,8 +13,8 @@ export interface Type extends BuildableType<Builder> {
 }
 
 export class Impl implements Type {
-  private _object: JSObject<any>;
-  private _pathSeparator: string;
+  public _object: JSObject<any>;
+  public _pathSeparator: string;
 
   public constructor() {
     this._object = {};

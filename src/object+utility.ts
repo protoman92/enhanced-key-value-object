@@ -1,4 +1,13 @@
-import { Builder, EKVObjectType, Impl, Type } from './object';
+import { Nullable } from 'javascriptutilities';
+
+import {
+  Builder,
+  EKVObjectType,
+  Impl,
+  Type,
+  objectKey,
+  pathSeparatorKey,
+} from './object';
 
 /**
  * Create a new builder object.
@@ -18,13 +27,31 @@ export function empty(): Type {
 
 /**
  * Create an enhanced key-value object with an object.
- * @param {EKVObjectType} object An EKVObjectType instance.
+ * @param {Nullable<EKVObjectType>} object An EKVObjectType instance.
  * @returns {Type} A Type instance.
  */
-export function just(object: EKVObjectType): Type {
-  if (object instanceof Impl) {
-    return object;
+export function just(object: Nullable<EKVObjectType>): Type {
+  if (object !== undefined && object !== null) {
+    if (object instanceof Impl) {
+      return object;
+    } else {
+      let innerObject = (object as any)[objectKey];
+      let pathSeparator = (object as any)[pathSeparatorKey];
+
+      if (
+        innerObject !== undefined &&
+        innerObject !== null &&
+        typeof pathSeparator === 'string'
+      ) {
+        return builder()
+          .withObject(innerObject)
+          .withPathSeparator(pathSeparator)
+          .build();
+      } else {
+        return builder().withObject(object).build();
+      }
+    }
   } else {
-    return builder().withObject(object).build();
+    return empty();
   }
 }

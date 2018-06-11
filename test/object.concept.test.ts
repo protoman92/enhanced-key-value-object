@@ -1,6 +1,6 @@
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
-import { Impl } from './../src/object';
+import { Impl, objectKey, pathSeparatorKey } from './../src/object';
 let deepEqual = require('deep-equal');
 
 describe('Enhanced key-value object should be implemented correctly', () => {
@@ -174,5 +174,19 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(ekvObject1.valueAtNode(destPath).value).toBe(1);
     expect(ekvObject2.valueAtNode(sourcePath).isFailure()).toBeTruthy();
     expect(ekvObject2.valueAtNode(destPath).value).toBe(1);
+  });
+
+  it('Constructing object with just should work correctly', () => {
+    /// Setup
+    let innerObject = { a: 1, b: 2, c: 3 };
+    let possibleObject1 = { [objectKey]: undefined };
+    let possibleObject2 = { [objectKey]: innerObject, [pathSeparatorKey]: 1 };
+    let possibleObject3 = { [objectKey]: innerObject, [pathSeparatorKey]: '/' };
+
+    /// When && Then
+    expect(EKVObject.just(possibleObject1).valueAtNode('a').isFailure()).toBeTruthy();
+    expect(EKVObject.just(possibleObject2).valueAtNode('a').isFailure()).toBeTruthy();
+    expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(innerObject.a);
+    expect(EKVObject.just(undefined).clonedObject).toEqual({});
   });
 });
