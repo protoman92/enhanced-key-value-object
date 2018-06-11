@@ -34,4 +34,17 @@ describe('EK Object should be immutable', () => {
     expect(moved.valueAtNode(sourcePath).isFailure()).toBeTruthy();
     expect(moved.valueAtNode(destPath).isSuccess()).toBeTruthy();
   });
+
+  it('Updating value with reference object should remove reference to said object', () => {
+    /// Setup
+    let path = 'a.b.c';
+    let valueObject: JSObject<any> = {};
+
+    /// When
+    ekvObject = ekvObject.updatingValue(path, valueObject);
+    valueObject.d = 1;
+
+    /// Then
+    expect(ekvObject.valueAtNode(`${path}.d`).isFailure()).toBeTruthy();
+  });
 });

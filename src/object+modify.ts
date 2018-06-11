@@ -1,6 +1,7 @@
 import { JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
+import { shallowClone } from './util';
 
 export type EKVMapFn = (value: Try<any>) => TryResult<any>;
 
@@ -97,7 +98,7 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
       let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        currentResult[subpath] = Try.unwrap(mapFn(Try.unwrap(interValue))).value;
+        currentResult[subpath] = shallowClone(Try.unwrap(mapFn(Try.unwrap(interValue))).value);
         break;
       }
 
