@@ -1,4 +1,4 @@
-import { Try } from 'javascriptutilities';
+import { Try, JSObject } from 'javascriptutilities';
 import { Impl } from './object';
 
 declare module './object' {
@@ -32,12 +32,20 @@ declare module './object' {
     stringAtNode(path: string): Try<string>;
   }
 
-  export interface Impl extends Type { }
+  export interface Impl extends Type {
+    /**
+     * Access the value at a path for an external object.
+     * @param {JSObject<any>} object The object to access values from.
+     * @param {string} path The path at which to access the value.
+     * @returns {Try<any>} A Try instance.
+     */
+    _valueAtNode(object: JSObject<any>, path: string): Try<any>;
+  }
 }
 
-Impl.prototype.valueAtNode = function (path: string): Try<any> {
+Impl.prototype._valueAtNode = function (object: JSObject<any>, path: string): Try<any> {
   let subpaths = path.split(this.pathSeparator);
-  let currentResult = this.actualObject;
+  let currentResult = object;
 
   for (let subpath of subpaths) {
     try {
@@ -54,6 +62,10 @@ Impl.prototype.valueAtNode = function (path: string): Try<any> {
   }
 
   return Try.success(currentResult);
+};
+
+Impl.prototype.valueAtNode = function (path: string): Try<any> {
+  return this._valueAtNode(this.actualObject, path);
 };
 
 Impl.prototype.booleanAtNode = function (path: string): Try<boolean> {

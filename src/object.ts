@@ -39,12 +39,20 @@ export class Impl implements Type {
     return this.builder().withBuildable(this);
   }
 
-  public setObject(object: JSObject<any>) {
+  public settingObjectUnsafely(object: JSObject<any>) {
     this._object = object;
+    return this;
   }
 
-  public setPathSeparator(separator: string) {
+  public settingPathSeparatorUnsafely(separator: string) {
     this._pathSeparator = separator;
+    return this;
+  }
+
+  public vopyingPropertiesUnsafely(ekvObject: Impl) {
+    return this
+      .settingObjectUnsafely(ekvObject._object)
+      .settingPathSeparatorUnsafely(ekvObject._pathSeparator);
   }
 }
 
@@ -57,7 +65,7 @@ export class Builder implements BuilderType<Type> {
 
   public withObject(object: JSObject<any>) {
     if (object !== undefined && object !== null) {
-      this.object.setObject(JSON.parse(JSON.stringify(object)));
+      this.object.settingObjectUnsafely(JSON.parse(JSON.stringify(object)));
     }
 
     return this;
@@ -65,7 +73,7 @@ export class Builder implements BuilderType<Type> {
 
   public withPathSeparator(separator: string) {
     if (separator !== undefined && separator != undefined) {
-      this.object.setPathSeparator(separator);
+      this.object.settingPathSeparatorUnsafely(separator);
     }
 
     return this;
@@ -73,7 +81,7 @@ export class Builder implements BuilderType<Type> {
 
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
-      this.object.setObject(buildable.clonedObject);
+      this.object.settingObjectUnsafely(buildable.clonedObject);
       return this.withPathSeparator(buildable.pathSeparator);
     } else {
       return this;

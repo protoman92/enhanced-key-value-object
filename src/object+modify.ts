@@ -1,6 +1,8 @@
-import { JSObject, Nullable, Try } from 'javascriptutilities';
+import { JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
+
+export type EKVMapFn = (value: Try<any>) => TryResult<any>;
 
 declare module './object' {
   export interface Type {
@@ -13,10 +15,10 @@ declare module './object' {
     /**
      * Map the value at a certain path to another value.
      * @param {string} path The path at which to map the value.
-     * @param {(value: Try<any>) => Try<any>} mapFn Mapping function.
+     * @param {EKVMapFn} mapFn Mapping function.
      * @returns {Type} A Type instance.
      */
-    mappingValue(path: string, mapFn: (value: Try<any>) => Try<any>): Type;
+    mappingValue(path: string, mapFn: EKVMapFn): Type;
 
     /**
      * Update value at a certain path.
@@ -57,49 +59,79 @@ declare module './object' {
     movingValue(src: string, dest: string): Type;
   }
 
-  export interface Impl extends Type { }
+  export interface Impl extends Type {
+    /**
+     * Map value at a certain path by modifying an external object. This method
+     * should not be used anywhere else except internally.
+     * @param {JSObject<any>} object The object to modify.
+     * @param {string} path The path at which to update value.
+     * @param {EKVMapFn} mapFn Mapping function.
+     * @returns {Impl} An Impl instance.
+     */
+    _mappingValue(object: JSObject<any>, path: string, mapFn: EKVMapFn): Impl;
+
+    /**
+     * Update value at a certain path by modifying an external object. This
+     * method should not be used anywhere else except internally.
+     * @param {JSObject<any>} object The object to modify.
+     * @param {string} path The path at which to update value.
+     * @param {Nullable<any>} value Any value.
+     * @returns {Impl} An Impl instance.
+     */
+    _updatingValue(object: JSObject<any>, path: string, value: Nullable<any>): Impl;
+  }
 }
 
 Impl.prototype.emptying = function (): Type {
   return empty();
 };
 
-Impl.prototype.mappingValue = function (path: string, mapFn: (value: Try<any>) => Try<any>): Type {
+Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, mapFn: EKVMapFn): Impl {
   try {
     let subpaths = path.split(this.pathSeparator);
-    let objectCopy = this.clonedObject;
+    let objectCopy = object;
     let currentResult = objectCopy;
 
     for (let i = 0, length = subpaths.length; i < length; i++) {
       let subpath = subpaths[i];
-      let intermediateValue = currentResult[subpath];
+      let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        currentResult[subpath] = mapFn(Try.unwrap(intermediateValue)).value;
+        currentResult[subpath] = Try.unwrap(mapFn(Try.unwrap(interValue))).value;
         break;
       }
 
       if (
-        intermediateValue === undefined ||
-        intermediateValue === null ||
-        !Object.isExtensible(intermediateValue) ||
-        intermediateValue instanceof Array
+        interValue === undefined ||
+        interValue === null ||
+        !Object.isExtensible(interValue) ||
+        interValue instanceof Array
       ) {
-        intermediateValue = {};
-        currentResult[subpath] = intermediateValue;
+        interValue = {};
+        currentResult[subpath] = interValue;
       }
 
-      currentResult = intermediateValue;
+      currentResult = interValue;
     }
 
-    return this.cloneBuilder().withObject(objectCopy).build();
+    return new Impl()
+      .vopyingPropertiesUnsafely(this)
+      .settingObjectUnsafely(objectCopy);
   } catch (e) {
-    return this.cloneBuilder().build();
+    return this.cloneBuilder().build() as Impl;
   }
 };
 
+Impl.prototype.mappingValue = function (path: string, mapFn: EKVMapFn): Type {
+  return this._mappingValue(this.clonedObject, path, mapFn);
+};
+
+Impl.prototype._updatingValue = function (object: JSObject<any>, path: string, value: Nullable<any>): Impl {
+  return this._mappingValue(object, path, () => value);
+};
+
 Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
-  return this.mappingValue(path, () => Try.unwrap(value));
+  return this.mappingValue(path, () => value);
 };
 
 Impl.prototype.removingValue = function (path: string): Type {
@@ -111,7 +143,10 @@ Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
     let currentObject = this.clonedObject;
     let deepCloned = JSON.parse(JSON.stringify(object));
     let newObject = Object.assign(currentObject, deepCloned);
-    return this.cloneBuilder().withObject(newObject).build();
+
+    return new Impl()
+      .vopyingPropertiesUnsafely(this)
+      .settingObjectUnsafely(newObject);
   } catch (e) {
     return this.cloneBuilder().build();
   }

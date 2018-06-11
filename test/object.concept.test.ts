@@ -145,7 +145,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(actualObject.equalsForValues(ekvObject, paths)).toBeFalsy();
   });
 
-  it('Cloning with paths should work', () => {
+  it('Cloning for paths should work', () => {
     /// Setup
     let paths = ['a.a1_1.a2_1', 'd'];
 

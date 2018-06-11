@@ -1,5 +1,4 @@
 import { Impl, Type } from './object';
-import { empty } from './object+utility';
 
 declare module './object' {
   export interface Type {
@@ -15,10 +14,11 @@ declare module './object' {
 }
 
 Impl.prototype.cloningForPaths = function (...paths: string[]): Type {
-  let cloned = empty();
+  let result = new Impl();
+  let resultObject = {};
 
   paths.forEach(v => this.valueAtNode(v)
-    .doOnNext(v1 => cloned = cloned.updatingValue(v, v1)));
+    .doOnNext(v1 => result = result._updatingValue(resultObject, v, v1)));
 
-  return cloned;
+  return result;
 };
