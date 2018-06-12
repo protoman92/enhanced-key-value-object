@@ -1,4 +1,4 @@
-import { JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
+import { JSObject, Nullable, Objects, Try, TryResult } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
 import { shallowClone } from './util';
@@ -42,6 +42,16 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     updatingValues(object: Nullable<JSObject<any>>): Type;
+
+    /**
+     * Assuming that each key in the external object consists of subkeys joined
+     * by a separator, update the current object with values from said keys.
+     * @param {JSObject<any>} values A JSObject instance.
+     * @param {string} [separator] Optional separator, defaults to the inner
+     * path separator.
+     * @returns {Type} A Type instance.
+     */
+    updatingValuesWithFullPaths(values: JSObject<any>, separator?: string): Type;
 
     /**
      * Copy value from one node to another.
@@ -158,6 +168,21 @@ Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
   } catch (e) {
     return this.cloneBuilder().build();
   }
+};
+
+Impl.prototype.updatingValuesWithFullPaths = function (object: JSObject<any>, separator?: string): Type {
+  let pathSeparator = this.pathSeparator;
+  let sep = separator || pathSeparator;
+  let shouldReconstruct = sep !== pathSeparator;
+  let result = this;
+  let resultObject = this.shallowClonedObject;
+
+  Objects.entries(object).forEach(([key, value]) => {
+    let actualKey = shouldReconstruct ? key.split(sep).join(pathSeparator) : key;
+    result = result._updatingValue(resultObject, actualKey, value);
+  });
+
+  return result;
 };
 
 Impl.prototype.copyingValue = function (src: string, dest: string): Type {

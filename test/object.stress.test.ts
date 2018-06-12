@@ -7,7 +7,6 @@ import {
 } from 'javascriptutilities';
 
 import { EKVObject } from './../src';
-
 let alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let separator = '&';
 let keyIdentifier = 'stress';
@@ -125,18 +124,26 @@ describe('EKVObject should work correctly under stress', () => {
       let ekvObject = createEKVObject(allCombinations);
 
       /// When
-      let valuesWithFullPaths = ekvObject.valuesWithFullPaths();
+      let fullPathValues = ekvObject.valuesWithFullPaths();
+
+      let validReconstructed1 = EKVObject.empty()
+        .updatingValuesWithFullPaths(fullPathValues);
+
+      let validReconstructed2 = EKVObject.empty()
+        .updatingValuesWithFullPaths(fullPathValues, 'othersep');
 
       /// Then
-      Objects.entries(valuesWithFullPaths).forEach(([key]) => {
+      Objects.entries(fullPathValues).forEach(([key]) => {
         let actualKey = key.split(separator)
           .filter(v => v.includes(keyIdentifier))
           .join(separator);
 
         let actualValue = allCombinations[actualKey];
-        expect(actualValue).toBeDefined();
-        expect(actualValue).not.toBeNull();
+        expect(actualValue).toBeDefined(); expect(actualValue).not.toBeNull();
       });
+
+      expect(validReconstructed1.valuesWithFullPaths()).toEqual(fullPathValues);
+      expect(validReconstructed2.valuesWithFullPaths()).toEqual(fullPathValues);
     }
   });
 });
