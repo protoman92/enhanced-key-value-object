@@ -1,4 +1,5 @@
 import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
+import { shallowCloneObject } from './util';
 
 export type EKVObjectType = Type | JSObject<any>;
 export let objectKey: keyof Impl = '_object';
@@ -26,7 +27,7 @@ export class Impl implements Type {
   }
 
   public get shallowClonedObject(): JSObject<any> {
-    return Object.assign({}, this._object);
+    return shallowCloneObject(this._object);
   }
 
   public get deepClonedObject(): JSObject<any> {

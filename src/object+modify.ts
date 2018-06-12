@@ -1,7 +1,7 @@
 import { JSObject, Nullable, Objects, Try, TryResult } from 'javascriptutilities';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
-import { shallowClone } from './util';
+import { shallowClone, shallowCloneObject } from './util';
 
 export type EKVMapFn = (value: Try<any>) => TryResult<any>;
 
@@ -132,7 +132,7 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
          * share the same references to some inner objects, but every time we
          * update at those paths we clone these to avoid state sharing.
          */
-        interValue = Object.assign({}, interValue);
+        interValue = shallowCloneObject(interValue);
       }
 
       currentResult[subpath] = interValue;

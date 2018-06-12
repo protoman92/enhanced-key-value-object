@@ -1,5 +1,9 @@
 import { Nullable } from 'javascriptutilities';
 
+export function shallowCloneObject(object: {}): {} {
+  return Object.assign({}, object);
+}
+
 export function shallowClone<T>(object: Nullable<T>): Nullable<T> {
   if (object === undefined || object === null) {
     return object;
@@ -12,6 +16,6 @@ export function shallowClone<T>(object: Nullable<T>): Nullable<T> {
   } else if (object instanceof Array) {
     return object.map(v => v) as any;
   } else {
-    return Object.assign({}, object);
+    return shallowCloneObject(object) as T;
   }
 }
