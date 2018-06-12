@@ -108,7 +108,14 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
       let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        currentResult[subpath] = shallowClone(Try.unwrap(mapFn(Try.unwrap(interValue))).value);
+        let value = shallowClone(Try.unwrap(mapFn(Try.unwrap(interValue))).value);
+
+        if (value !== undefined && value !== null) {
+          currentResult[subpath] = value;
+        } else {
+          delete currentResult[subpath];
+        }
+
         break;
       }
 
