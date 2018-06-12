@@ -1,5 +1,6 @@
-import { Try, JSObject } from 'javascriptutilities';
+import { JSObject, Objects, Try } from 'javascriptutilities';
 import { Impl } from './object';
+import { just } from './object+utility';
 
 declare module './object' {
   export interface Type {
@@ -30,6 +31,14 @@ declare module './object' {
      * @returns {Try<string>} A Try instance.
      */
     stringAtNode(path: string): Try<string>;
+
+    /**
+     * Access all values along with the full joined access paths.
+     * @param {string} [separator] Optional separator, defaults to the inner
+     * path separator.
+     * @returns {JSObject<any>} A JSObject instance.
+     */
+    valuesWithFullPaths(separator?: string): JSObject<any>;
   }
 
   export interface Impl extends Type {
@@ -81,4 +90,27 @@ Impl.prototype.numberAtNode = function (path: string): Try<number> {
 Impl.prototype.stringAtNode = function (path: string): Try<string> {
   return this.valueAtNode(path)
     .filter(v => typeof v === 'string', `No string found at ${path}`);
+};
+
+Impl.prototype.valuesWithFullPaths = function (separator?: string): JSObject<any> {
+  let result: JSObject<any> = {};
+  let sep = separator || this.pathSeparator;
+
+  Objects.entries(this.actualObject).forEach(([key, value]) => {
+    if (
+      typeof value === 'boolean' ||
+      typeof value === 'number' ||
+      typeof value === 'string'
+    ) {
+      result[key] = value;
+    } else {
+      let subObjects = just(value).valuesWithFullPaths(sep);
+
+      Objects.entries(subObjects).map(([subKey, subValue]) => {
+        result[`${key}${sep}${subKey}`] = subValue;
+      });
+    }
+  });
+
+  return result;
 };

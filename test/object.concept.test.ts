@@ -175,7 +175,9 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(ekvObject2.valueAtNode(sourcePath).isFailure()).toBeTruthy();
     expect(ekvObject2.valueAtNode(destPath).value).toBe(1);
   });
+});
 
+describe('Utilities should be implemented correctly', () => {
   it('Constructing object with just should work correctly', () => {
     /// Setup
     let innerObject = { a: 1, b: 2, c: 3 };
@@ -188,5 +190,25 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(EKVObject.just(possibleObject2).valueAtNode('a').isFailure()).toBeTruthy();
     expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(innerObject.a);
     expect(EKVObject.just(undefined).deepClonedObject).toEqual({});
+  });
+});
+
+describe('Complex operations should be implemented correctly', () => {
+  it('Accessing values with full paths should work correctly', () => {
+    /// Setup
+    let object = { a: [{ a: 1 }, { b: 2 }], b: { c: 1, d: 2 }, c: 1, d: 2 };
+    let ekvObject = EKVObject.just(object);
+
+    /// When
+    let valuesWithFullPaths = ekvObject.valuesWithFullPaths();
+
+    /// Then
+    expect(valuesWithFullPaths).toEqual({
+      'a.0.a': 1,
+      'a.1.b': 2,
+      'b.c': 1,
+      'b.d': 2,
+      c: 1, d: 2,
+    });
   });
 });

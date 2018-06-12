@@ -3,15 +3,17 @@ import {
   JSObject,
   Numbers,
   Objects,
+  Strings,
 } from 'javascriptutilities';
 
 import { EKVObject } from './../src';
 
 let alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-let separator = '.';
+let separator = '&';
+let keyIdentifier = 'stress';
 
 function createAlphabeticalLevels(levelCount: number): string[] {
-  return alphabets.split('').slice(0, levelCount);
+  return alphabets.split('').slice(0, levelCount).map(v => `${keyIdentifier}${v}`);
 }
 
 function createAllKeys(levels: string[], countPerLevel: number): string[] {
@@ -24,15 +26,36 @@ function createAllKeys(levels: string[], countPerLevel: number): string[] {
     let subKeys = createAllKeys(levels.slice(0, subLength - 1), countPerLevel);
     let lastKeys = createAllKeys([last], countPerLevel);
 
-    return subKeys
-      .map(v => lastKeys.map(v1 => v + separator + v1))
+    return subKeys.map(v => lastKeys.map(v1 => v + separator + v1))
       .reduce((a, b) => a.concat(b), []);
   }
 }
 
-function createCombinations(levels: string[], countPerLevel: number): JSObject<number> {
+function createCombinations(levels: string[], countPerLevel: number): JSObject<any> {
   let allCombinations: JSObject<number> = {};
   let allKeys = createAllKeys(levels, countPerLevel);
+  let possibleValueTypes = ['array', 'number', 'object', 'string'];
+
+  function randomizeData(): any {
+    let randomType = Collections.randomElement(possibleValueTypes).value;
+
+    switch (randomType) {
+      case 'array':
+        return Numbers.range(0, 5).map(() => Strings.randomString(10));
+
+      case 'number':
+        return Numbers.randomBetween(0, 1000);
+
+      case 'object':
+        return Numbers.range(0, 5)
+          .map(v => ({ [v]: Strings.randomString(10) }))
+          .reduce((acc, v) => Object.assign(acc, v), {});
+
+      case 'string':
+      default:
+        return Strings.randomString(10);
+    }
+  }
 
   for (let key of allKeys) {
     let keyParts = key.split(separator);
@@ -43,14 +66,14 @@ function createCombinations(levels: string[], countPerLevel: number): JSObject<n
       .map(v => keyParts.slice(0, v + 1))
       .map(v => v.join(separator));
 
-    subKeys.forEach(v => allCombinations[v] = Numbers.randomBetween(0, 100000));
+    subKeys.forEach(v => allCombinations[v] = randomizeData());
   }
 
   return allCombinations;
 }
 
 function createEKVObject(combinations: JSObject<number>): EKVObject.Type {
-  let ekvObject = EKVObject.empty();
+  let ekvObject = EKVObject.builder().withPathSeparator(separator).build();
 
   Objects.entries(combinations).forEach(([v, i]) => {
     ekvObject = ekvObject.updatingValue(v, i);
@@ -91,6 +114,29 @@ describe('EKVObject should work correctly under stress', () => {
         expect(copiedObject.valueAtNode(destPath).value).toEqual(srcValue);
         expect(movedObject.valueAtNode(destPath).value).toEqual(srcValue);
       }
+    }
+  });
+
+  it('Values with full paths should work correctly', () => {
+    for (let i of Numbers.range(1, maxLevel)) {
+      /// Setup
+      let levels = createAlphabeticalLevels(i);
+      let allCombinations = createCombinations(levels, countPerLevel);
+      let ekvObject = createEKVObject(allCombinations);
+
+      /// When
+      let valuesWithFullPaths = ekvObject.valuesWithFullPaths();
+
+      /// Then
+      Objects.entries(valuesWithFullPaths).forEach(([key]) => {
+        let actualKey = key.split(separator)
+          .filter(v => v.includes(keyIdentifier))
+          .join(separator);
+
+        let actualValue = allCombinations[actualKey];
+        expect(actualValue).toBeDefined();
+        expect(actualValue).not.toBeNull();
+      });
     }
   });
 });
