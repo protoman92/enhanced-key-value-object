@@ -1,3 +1,4 @@
+import { Collections, Numbers, Nullable } from 'javascriptutilities';
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
 import { Impl, objectKey, pathSeparatorKey } from './../src/object';
@@ -73,7 +74,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 
     /// When
     let ekvObject1 = ekvObject.updatingValue(path1, 1);
-    let ekvObject2 = ekvObject.updatingValue(path2, [1, 2, 3]);
+    let ekvObject2 = ekvObject.mappingValue(path2, () => [1, 2, 3]);
     let ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
 
     /// Then
@@ -210,5 +211,40 @@ describe('Complex operations should be implemented correctly', () => {
       'b.d': 2,
       c: 1, d: 2,
     });
+  });
+
+  it('Removing array index should work correctly', () => {
+    /// Setup
+    let array: Nullable<number>[] = [
+      ...Numbers.range(0, 100),
+      undefined, null,
+      ...Numbers.range(0, 100),
+      null, undefined,
+      ...Numbers.range(0, 100),
+    ];
+
+    let path = 'a.b.c';
+    let state = EKVObject.empty();
+    expect(state.removingArrayIndex(path, 0).valueAtNode(path).value).toBeFalsy();
+    state = state.updatingValue(path, array);
+
+    /// When
+    for (let i = 0; i < 100; i++) {
+      let indexArray = Numbers.range(0, array.length - i);
+      let removedIndex = Collections.randomElement(indexArray).value!;
+      array.splice(removedIndex, 1);
+      state = state.removingArrayIndex(path, removedIndex);
+
+      /// Then
+      array.forEach((v, j) => {
+        let stateValue = state.valueAtNode(`${path}.${j}`);
+
+        if (stateValue.isSuccess()) {
+          expect(stateValue.value).toEqual(v);
+        } else {
+          expect(v === undefined || v === null).toBeTruthy();
+        }
+      });
+    }
   });
 });

@@ -4,6 +4,7 @@ import { empty } from './object+utility';
 import { shallowClone, shallowCloneObject } from './util';
 
 export type EKVMapFn = (value: Try<any>) => TryResult<any>;
+export type EKVRawMapFn = (value: Nullable<any>) => Nullable<any>;
 
 declare module './object' {
   export interface Type {
@@ -37,6 +38,17 @@ declare module './object' {
     removingValue(path: string): Type;
 
     /**
+     * Assuming that the value found at the specified path is an Array, or an
+     * Object which is convertible to an Array (i.e. all its keys are number
+     * strings), delete the value found at the specified index and shift all
+     * subsequent values one index up.
+     * @param {string} path The path of the Array-compatible object.
+     * @param {number} index The index to remove value.
+     * @returns {Type} A Type instance.
+     */
+    removingArrayIndex(path: string, index: number): Type;
+
+    /**
      * Update values from some object.
      * @param {Nullable<JSObject<any>>} object A JSObject instance.
      * @returns {Type} A Type instance.
@@ -57,7 +69,7 @@ declare module './object' {
      * Copy value from one node to another.
      * @param {string} src The source path.
      * @param {string} dest The destination path.
-     * @returns {Type<T>} A Type instance.
+     * @returns {Type} A Type instance.
      */
     copyingValue(src: string, dest: string): Type;
 
@@ -65,7 +77,7 @@ declare module './object' {
      * Move value from one node to another.
      * @param {string} src The source path.
      * @param {string} dest The destination path.
-     * @returns {Type<T>} A Type instance.
+     * @returns {Type} A Type instance.
      */
     movingValue(src: string, dest: string): Type;
   }
@@ -76,10 +88,10 @@ declare module './object' {
      * should not be used anywhere else except internally.
      * @param {JSObject<any>} object The object to modify.
      * @param {string} path The path at which to update value.
-     * @param {EKVMapFn} mapFn Mapping function.
+     * @param {EKVRawMapFn} mapFn Mapping function.
      * @returns {Impl} An Impl instance.
      */
-    _mappingValue(object: JSObject<any>, path: string, mapFn: EKVMapFn): Impl;
+    _mappingValue(object: JSObject<any>, path: string, mapFn: EKVRawMapFn): Impl;
 
     /**
      * Update value at a certain path by modifying an external object. This
@@ -90,14 +102,35 @@ declare module './object' {
      * @returns {Impl} An Impl instance.
      */
     _updatingValue(object: JSObject<any>, path: string, value: Nullable<any>): Impl;
+
+    /**
+     * Remove value at a by modifying an external object.
+     * @param {JSObject<any>} object The object to modify.
+     * @param {string} path The path at which to remove value.
+     * @returns {Impl} An Impl instance.
+     */
+    _removingValue(object: JSObject<any>, path: string): Impl;
+
+    /**
+     * Copy value from one node to another by modifying an external object.
+     * @param {string} src The source path.
+     * @param {string} dest The destination path.
+     * @returns {Impl} An Impl instance.
+     */
+    _copyingValue(object: JSObject<any>, src: string, dest: string): Impl;
+
+    /**
+     * Move value from one node to another by modifying an external object.
+     * @param {JSObject<any>} object The object to modify.
+     * @param {string} src The source path.
+     * @param {string} dest The destination path.
+     * @returns {Type} An Impl instance.
+     */
+    _movingValue(object: JSObject<any>, src: string, dest: string): Impl;
   }
 }
 
-Impl.prototype.emptying = function (): Type {
-  return empty();
-};
-
-Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, mapFn: EKVMapFn): Impl {
+Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, mapFn: EKVRawMapFn): Impl {
   try {
     let subpaths = path.split(this.pathSeparator);
     let objectCopy = object;
@@ -108,14 +141,7 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
       let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        let value = shallowClone(Try.unwrap(mapFn(Try.unwrap(interValue))).value);
-
-        if (value !== undefined && value !== null) {
-          currentResult[subpath] = value;
-        } else {
-          delete currentResult[subpath];
-        }
-
+        currentResult[subpath] = shallowClone(mapFn(interValue));
         break;
       }
 
@@ -147,20 +173,53 @@ Impl.prototype._mappingValue = function (object: JSObject<any>, path: string, ma
   }
 };
 
-Impl.prototype.mappingValue = function (path: string, mapFn: EKVMapFn): Type {
-  return this._mappingValue(this.shallowClonedObject, path, mapFn);
-};
-
 Impl.prototype._updatingValue = function (object: JSObject<any>, path: string, value: Nullable<any>): Impl {
   return this._mappingValue(object, path, () => value);
 };
 
+Impl.prototype._removingValue = function (object: JSObject<any>, path: string): Impl {
+  return this._updatingValue(object, path, undefined);
+};
+
+Impl.prototype._copyingValue = function (object: JSObject<any>, src: string, dest: string): Impl {
+  let sourceValue = this._valueAtNode(object, src);
+  return this._updatingValue(object, dest, sourceValue.value);
+};
+
+Impl.prototype._movingValue = function (object: JSObject<any>, src: string, dest: string): Impl {
+  return this._copyingValue(object, src, dest)._removingValue(object, src);
+};
+
+Impl.prototype.emptying = function (): Type {
+  return empty();
+};
+
+Impl.prototype.mappingValue = function (path: string, mapFn: EKVMapFn): Type {
+  return this._mappingValue(this.shallowClonedObject, path, v => {
+    return Try.unwrap(mapFn(Try.unwrap(v))).value;
+  });
+};
+
 Impl.prototype.updatingValue = function (path: string, value: Nullable<any>): Type {
-  return this.mappingValue(path, () => value);
+  return this._updatingValue(this.shallowClonedObject, path, value);
 };
 
 Impl.prototype.removingValue = function (path: string): Type {
-  return this.updatingValue(path, undefined);
+  return this._removingValue(this.shallowClonedObject, path);
+};
+
+Impl.prototype.removingArrayIndex = function (path: string, index: number): Type {
+  let clonedObject = this.shallowClonedObject;
+  let arrayObject = this._valueAtNode(clonedObject, path).value;
+
+  if (arrayObject !== undefined && arrayObject !== null) {
+    let array = Objects.entries(arrayObject).map(v => v[1]);
+    array.splice(index, 1);
+    this._updatingValue(clonedObject, path, array);
+    return this._updatingValue(clonedObject, path, array);
+  }
+
+  return this;
 };
 
 Impl.prototype.updatingValues = function (object: JSObject<any>): Type {
@@ -193,10 +252,9 @@ Impl.prototype.updatingValuesWithFullPaths = function (object: JSObject<any>, se
 };
 
 Impl.prototype.copyingValue = function (src: string, dest: string): Type {
-  let sourceValue = this.valueAtNode(src);
-  return this.updatingValue(dest, sourceValue.value);
+  return this._copyingValue(this.shallowClonedObject, src, dest);
 };
 
-Impl.prototype.movingValue = function (src: string, dest: string): Type {
-  return this.copyingValue(src, dest).removingValue(src);
+Impl.prototype.movingValue = function (src: string, dest: string): Impl {
+  return this._movingValue(this.shallowClonedObject, src, dest);
 };
