@@ -213,6 +213,18 @@ describe('Complex operations should be implemented correctly', () => {
     });
   });
 
+  it('Updating array with undefined/null values at specified path should work', () => {
+    /// Setup
+    let path = 'a.b.c';
+    let state = new Impl();
+
+    /// When
+    state = state._updatingArray({}, path, v => v.concat(1, 2, 3));
+
+    /// Then
+    expect(state.valueAtNode(path).value).toEqual([1, 2, 3]);
+  })
+
   it('Removing array index should work correctly', () => {
     /// Setup
     let array: Nullable<number>[] = [
@@ -225,7 +237,6 @@ describe('Complex operations should be implemented correctly', () => {
 
     let path = 'a.b.c';
     let state = EKVObject.empty();
-    expect(state.removingArrayIndex(path, 0).valueAtNode(path).value).toBeFalsy();
     state = state.updatingValue(path, array);
 
     /// When
@@ -246,5 +257,16 @@ describe('Complex operations should be implemented correctly', () => {
         }
       });
     }
+  });
+
+  it('Inserting array value should work correctly', () => {
+    /// Setup
+    let state = EKVObject.just({ a: [1, 2, 3] });
+
+    /// When
+    state = state.insertingArrayValue('a', 1, 0);
+
+    /// Then
+    expect(state.valueAtNode('a').value).toEqual([1, 0, 2, 3]);
   });
 });

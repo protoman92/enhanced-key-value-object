@@ -49,6 +49,16 @@ declare module './object' {
     removingArrayIndex(path: string, index: number): Type;
 
     /**
+     * Assuming that the value found at the specified path is an Array-compatible
+     * object, insert a value at the specified index.
+     * @param {string} path The path of the Array-compatible object.
+     * @param {number} index The index to insert value.
+     * @param {*} value Any object.
+     * @returns {Type} A Type instance.
+     */
+    insertingArrayValue(path: string, index: number, value: any): Type;
+
+    /**
      * Update values from some object.
      * @param {Nullable<JSObject<any>>} object A JSObject instance.
      * @returns {Type} A Type instance.
@@ -102,6 +112,17 @@ declare module './object' {
      * @returns {Impl} An Impl instance.
      */
     _updatingValue(object: JSObject<any>, path: string, value: Nullable<any>): Impl;
+
+    /**
+     * Update an inner array with a mapping function by modifying an external
+     * object. This assumes the value at the specified path is either an Array
+     * or an Array-compatible object.
+     * @param {JSObject<any>} object The object to modify.
+     * @param {string} path The path at which to update value.
+     * @param {(v: Array<any>) => Array<any>} arrayFn Array mapper.
+     * @returns {Impl} An Impl instance.
+     */
+    _updatingArray(object: JSObject<any>, path: string, arrayFn: (v: Array<any>) => Array<any>): Impl;
 
     /**
      * Remove value at a by modifying an external object.
@@ -177,6 +198,12 @@ Impl.prototype._updatingValue = function (object, path, value) {
   return this._mappingValue(object, path, () => value);
 };
 
+Impl.prototype._updatingArray = function (object, path, arrayFn) {
+  let arrayObject = this._valueAtNode(object, path).getOrElse({});
+  let array = Objects.entries(arrayObject).map(v => v[1]);
+  return this._updatingValue(object, path, arrayFn(array));
+}
+
 Impl.prototype._removingValue = function (object, path) {
   return this._updatingValue(object, path, undefined);
 };
@@ -209,18 +236,16 @@ Impl.prototype.removingValue = function (path) {
 };
 
 Impl.prototype.removingArrayIndex = function (path, index) {
-  let clonedObject = this.shallowClonedObject;
-  let arrayObject = this._valueAtNode(clonedObject, path).value;
-
-  if (arrayObject !== undefined && arrayObject !== null) {
-    let array = Objects.entries(arrayObject).map(v => v[1]);
-    array.splice(index, 1);
-    this._updatingValue(clonedObject, path, array);
-    return this._updatingValue(clonedObject, path, array);
-  }
-
-  return this;
+  return this._updatingArray(this.shallowClonedObject, path, v => {
+    v.splice(index, 1); return v;
+  });
 };
+
+Impl.prototype.insertingArrayValue = function (path, index, value) {
+  return this._updatingArray(this.shallowClonedObject, path, v => {
+    v.splice(index, 0, value); return v;
+  });
+}
 
 Impl.prototype.updatingValues = function (object) {
   try {
