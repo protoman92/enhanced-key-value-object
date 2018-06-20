@@ -90,6 +90,14 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     movingValue(src: string, dest: string): Type;
+
+    /**
+     * Swap the values between two paths.
+     * @param {string} path1 The first path.
+     * @param {string} path2 The second path.
+     * @returns {Type} A Type instance.
+     */
+    swappingValue(path1: string, path2: string): Type;
   }
 
   export interface Impl extends Type {
@@ -283,3 +291,12 @@ Impl.prototype.copyingValue = function (src, dest): Type {
 Impl.prototype.movingValue = function (src, dest) {
   return this._movingValue(this.shallowClonedObject, src, dest);
 };
+
+Impl.prototype.swappingValue = function (path1, path2) {
+  let clonedObject = this.shallowClonedObject;
+  let value1 = this._valueAtNode(clonedObject, path1).value;
+  let value2 = this._valueAtNode(clonedObject, path2).value;
+  let result = this._updatingValue(clonedObject, path2, value1);
+  result = this._updatingValue(clonedObject, path1, value2);
+  return result;
+}

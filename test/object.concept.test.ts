@@ -269,4 +269,15 @@ describe('Complex operations should be implemented correctly', () => {
     /// Then
     expect(state.valueAtNode('a').value).toEqual([1, 0, 2, 3]);
   });
+
+  it('Swapping values should work correctly', () => {
+    /// Setup
+    let state = EKVObject.just({ a: { b: 1 }, b: { a: 2 } });
+
+    /// When
+    state = state.swappingValue('a.b', 'b.a');
+
+    /// Then
+    expect(state.deepClonedObject).toEqual({ a: { b: 2 }, b: { a: 1 } });
+  })
 });
