@@ -1,4 +1,4 @@
-import { Impl, Type } from './object';
+import { Impl } from './object';
 
 declare module './object' {
   export interface Type {
@@ -13,7 +13,7 @@ declare module './object' {
   export interface Impl extends Type { }
 }
 
-Impl.prototype.cloningForPaths = function (...paths: string[]): Type {
+Impl.prototype.cloningForPaths = function (...paths) {
   let result = new Impl();
   let resultObject = {};
 

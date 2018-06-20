@@ -1,4 +1,4 @@
-import { EKVObjectType, Impl } from './object';
+import { Impl } from './object';
 import { just } from './object+utility';
 
 declare module './object' {
@@ -20,11 +20,7 @@ declare module './object' {
   export interface Impl extends Type { }
 }
 
-Impl.prototype.equalsForValues = function (
-  object: EKVObjectType,
-  paths: string[],
-  equalFn?: (v1: any, v2: any) => boolean,
-): boolean {
+Impl.prototype.equalsForValues = function (object, paths, equalFn?) {
   let compareFn = equalFn !== undefined && equalFn !== null ? equalFn
     : (v1: any, v2: any) => v1 === v2;
 

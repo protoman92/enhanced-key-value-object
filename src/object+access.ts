@@ -52,7 +52,7 @@ declare module './object' {
   }
 }
 
-Impl.prototype._valueAtNode = function (object: JSObject<any>, path: string): Try<any> {
+Impl.prototype._valueAtNode = function (object, path) {
   let subpaths = path.split(this.pathSeparator);
   let currentResult = object;
 
@@ -73,26 +73,26 @@ Impl.prototype._valueAtNode = function (object: JSObject<any>, path: string): Tr
   return Try.success(currentResult);
 };
 
-Impl.prototype.valueAtNode = function (path: string): Try<any> {
+Impl.prototype.valueAtNode = function (path) {
   return this._valueAtNode(this.actualObject, path);
 };
 
-Impl.prototype.booleanAtNode = function (path: string): Try<boolean> {
+Impl.prototype.booleanAtNode = function (path) {
   return this.valueAtNode(path)
     .filter(v => typeof v === 'boolean', `No boolean found at ${path}`);
 };
 
-Impl.prototype.numberAtNode = function (path: string): Try<number> {
+Impl.prototype.numberAtNode = function (path: string) {
   return this.valueAtNode(path)
     .filter(v => typeof v === 'number', `No number found at ${path}`);
 };
 
-Impl.prototype.stringAtNode = function (path: string): Try<string> {
+Impl.prototype.stringAtNode = function (path: string) {
   return this.valueAtNode(path)
     .filter(v => typeof v === 'string', `No string found at ${path}`);
 };
 
-Impl.prototype.valuesWithFullPaths = function (separator?: string): JSObject<any> {
+Impl.prototype.valuesWithFullPaths = function (separator?) {
   let result: JSObject<any> = {};
   let sep = separator || this.pathSeparator;
 
