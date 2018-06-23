@@ -191,6 +191,22 @@ describe('Utilities should be implemented correctly', () => {
     expect(EKVObject.just(possibleObject2).valueAtNode('a').isFailure()).toBeTruthy();
     expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(innerObject.a);
     expect(EKVObject.just(undefined).deepClonedObject).toEqual({});
+
+    let unsafeClone = EKVObject.just(possibleObject3, 'unsafe');
+    (possibleObject3[objectKey] as any).a = 2;
+    expect(unsafeClone.valueAtNode('a').value).toEqual(2);
+  });
+
+  it('Deep cloning inner object should replace undefined with null', () => {
+    /// Setup
+    let ekvObject = EKVObject.just({ a: { b: undefined }, b: null }, 'unsafe');
+
+    /// When
+    let deepCloned = ekvObject.deepClonedObject;
+
+    /// Then
+    expect(deepCloned.a.b).toBeNull();
+    expect(deepCloned.b).toBeNull();
   });
 });
 
@@ -223,7 +239,7 @@ describe('Complex operations should be implemented correctly', () => {
 
     /// Then
     expect(state.valueAtNode(path).value).toEqual([1, 2, 3]);
-  })
+  });
 
   it('Removing array index should work correctly', () => {
     /// Setup
@@ -279,5 +295,5 @@ describe('Complex operations should be implemented correctly', () => {
 
     /// Then
     expect(state.deepClonedObject).toEqual({ a: { b: 2 }, b: { a: 1 } });
-  })
+  });
 });

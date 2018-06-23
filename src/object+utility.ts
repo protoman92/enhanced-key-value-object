@@ -28,9 +28,11 @@ export function empty(): Type {
 /**
  * Create an enhanced key-value object with an object.
  * @param {Nullable<EKVObjectType>} object An EKVObjectType instance.
+ * @param {('safe' | 'unsafe')} mode If safe mode, all objects are deep cloned
+ * before they are set, and otherwise for unsafe mode.
  * @returns {Type} A Type instance.
  */
-export function just(object: Nullable<EKVObjectType>): Type {
+export function just(object: Nullable<EKVObjectType>, mode: 'safe' | 'unsafe' = 'safe'): Type {
   if (object !== undefined && object !== null) {
     if (object instanceof Impl) {
       return object;
@@ -44,11 +46,11 @@ export function just(object: Nullable<EKVObjectType>): Type {
         typeof pathSeparator === 'string'
       ) {
         return builder()
-          .withObject(innerObject)
+          .withObject(innerObject, mode)
           .withPathSeparator(pathSeparator)
           .build();
       } else {
-        return builder().withObject(object).build();
+        return builder().withObject(object, mode).build();
       }
     }
   } else {

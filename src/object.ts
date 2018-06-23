@@ -31,7 +31,9 @@ export class Impl implements Type {
   }
 
   public get deepClonedObject(): JSObject<any> {
-    return JSON.parse(JSON.stringify(this._object));
+    return JSON.parse(JSON.stringify(this._object, (_k, v) => {
+      return v === undefined ? null : v;
+    }));
   }
 
   public get pathSeparator(): string {
@@ -70,9 +72,20 @@ export class Builder implements BuilderType<Type> {
     this.object = new Impl();
   }
 
-  public withObject(object: JSObject<any>) {
+  public withObject(object: JSObject<any>, mode: 'safe' | 'unsafe' = 'safe') {
     if (object !== undefined && object !== null) {
-      this.object.settingObjectUnsafely(JSON.parse(JSON.stringify(object)));
+      switch (mode) {
+        case 'unsafe':
+          this.object.settingObjectUnsafely(object);
+          break;
+
+        default:
+          this.object.settingObjectUnsafely(JSON.parse(JSON.stringify(object, (_k, v) => {
+            return v === undefined ? null : v;
+          })));
+
+          break;
+      }
     }
 
     return this;
