@@ -1,12 +1,6 @@
-import {
-  Collections,
-  JSObject,
-  Numbers,
-  Objects,
-  Strings,
-} from 'javascriptutilities';
-
+import { Collections, JSObject, Numbers, Objects, Strings } from 'javascriptutilities';
 import { EKVObject } from './../src';
+
 let alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let separator = '&';
 let keyIdentifier = 'stress';

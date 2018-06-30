@@ -1,13 +1,5 @@
 import { Nullable } from 'javascriptutilities';
-
-import {
-  Builder,
-  EKVObjectType,
-  Impl,
-  Type,
-  objectKey,
-  pathSeparatorKey,
-} from './object';
+import { Builder, EKVObjectType, Impl, objectKey, pathSeparatorKey, Type } from './object';
 
 /**
  * Create a new builder object.
