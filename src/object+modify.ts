@@ -1,7 +1,7 @@
 import { JSObject, Nullable, Objects, Try, TryResult } from 'javascriptutilities';
-import { DeleteKey, DELETE_KEY } from 'param';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
+import { DeleteKey, DELETE_KEY } from './param';
 import { shallowClone, shallowCloneObject } from './util';
 
 export type EKVMapFn = (value: Try<any>) => TryResult<any>;
