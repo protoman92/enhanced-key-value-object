@@ -1,4 +1,4 @@
-import { Collections, Numbers, Nullable } from 'javascriptutilities';
+import { Collections, Nullable, Numbers } from 'javascriptutilities';
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
 import { Impl, objectKey, pathSeparatorKey } from './../src/object';

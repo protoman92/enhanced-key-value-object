@@ -1,4 +1,5 @@
 import { JSObject, Nullable, Objects, Try, TryResult } from 'javascriptutilities';
+import { DeleteKey, DELETE_KEY } from 'param';
 import { Impl, Type } from './object';
 import { empty } from './object+utility';
 import { shallowClone, shallowCloneObject } from './util';
@@ -170,7 +171,14 @@ Impl.prototype._mappingValue = function (object, path, mapFn) {
       let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        currentResult[subpath] = shallowClone(mapFn(interValue));
+        let newValue = mapFn(interValue);
+
+        if (newValue instanceof DeleteKey) {
+          delete currentResult[subpath];
+        } else {
+          currentResult[subpath] = shallowClone(newValue);
+        }
+
         break;
       }
 
@@ -210,10 +218,10 @@ Impl.prototype._updatingArray = function (object, path, arrayFn) {
   let arrayObject = this._valueAtNode(object, path).getOrElse({});
   let array = Objects.entries(arrayObject).map(v => v[1]);
   return this._updatingValue(object, path, arrayFn(array));
-}
+};
 
 Impl.prototype._removingValue = function (object, path) {
-  return this._updatingValue(object, path, undefined);
+  return this._updatingValue(object, path, DELETE_KEY);
 };
 
 Impl.prototype._copyingValue = function (object, src, dest) {
@@ -253,7 +261,7 @@ Impl.prototype.insertingArrayValue = function (path, index, value) {
   return this._updatingArray(this.shallowClonedObject, path, v => {
     v.splice(index, 0, value); return v;
   });
-}
+};
 
 Impl.prototype.updatingValues = function (object) {
   try {
@@ -299,4 +307,4 @@ Impl.prototype.swappingValue = function (path1, path2) {
   let result = this._updatingValue(clonedObject, path2, value1);
   result = this._updatingValue(clonedObject, path1, value2);
   return result;
-}
+};

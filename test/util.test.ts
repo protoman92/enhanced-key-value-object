@@ -1,8 +1,13 @@
 import { JSObject } from 'javascriptutilities';
+import { DeleteKey } from './../src/param';
 import * as Util from './../src/util';
 
 describe('Utilities should be implemented correctly', () => {
   it('Shallow-cloning should work correctly', () => {
+    /// Setup && When && Then
+    let clonedDelete = Util.shallowClone(new DeleteKey());
+    expect(clonedDelete).toBeInstanceOf(DeleteKey);
+
     /// Setup && When && Then
     let clonedUndefined = Util.shallowClone(undefined);
     expect(clonedUndefined).toBeUndefined();
