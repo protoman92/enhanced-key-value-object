@@ -71,4 +71,16 @@ describe('Array operations should be implemented correctly', () => {
     expect(state.valueAtNode(buildPath(4)).value).toBe(0);
     expect(state.valueAtNode(buildPath(6)).isFailure()).toBeTruthy();
   });
+
+  it('Removing last array index - should work correctly', () => {
+    /// Setup
+    let itemCount = 1000;
+    let state = EKVObject.just({ a: Numbers.range(0, itemCount) });
+
+    /// When
+    state = state.removingArrayIndex('a', itemCount - 1);
+
+    /// Then
+    expect(Object.keys(state.valueAtNode('a').value)).toHaveLength(itemCount - 1);
+  });
 });

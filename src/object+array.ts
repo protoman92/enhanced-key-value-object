@@ -60,9 +60,10 @@ Impl.prototype._updatingArray = function (object, path, arrayFn) {
 
 Impl.prototype.removingArrayIndex = function (path, index) {
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
+    let sep = this.pathSeparator;
+    let buildPath = (i: number) => join(sep, path, i);
+
     if (index < lastIndex) {
-      let buildPath = (i: number) => join(sep, path, i);
-      let sep = this.pathSeparator;
       let newState = this._removingValue(v, buildPath(index));
 
       for (let i = index; i < lastIndex; i++) {
@@ -71,7 +72,7 @@ Impl.prototype.removingArrayIndex = function (path, index) {
 
       return newState;
     } else {
-      return this._cloneWithNewObject(v);
+      return this._removingValue(v, buildPath(index));
     }
   });
 };
