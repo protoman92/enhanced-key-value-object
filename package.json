@@ -1,6 +1,6 @@
 {
   "name": "enhanced-key-value-object",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Enhanced key value object that supports safe access and modification.",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
@@ -9,7 +9,8 @@
     "setup": "npm install",
     "build": "tsc",
     "test": "jest --coverage",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "prepublish": "rm -rf ./dist && tsc"
   },
   "repository": {
     "type": "git",
