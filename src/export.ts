@@ -1,4 +1,5 @@
 import './object+access';
+import './object+array';
 import './object+clone';
 import './object+equal';
 import './object+modify';

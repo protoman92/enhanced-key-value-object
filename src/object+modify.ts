@@ -39,27 +39,6 @@ declare module './object' {
     removingValue(path: string): Type;
 
     /**
-     * Assuming that the value found at the specified path is an Array, or an
-     * Object which is convertible to an Array (i.e. all its keys are number
-     * strings), delete the value found at the specified index and shift all
-     * subsequent values one index up.
-     * @param {string} path The path of the Array-compatible object.
-     * @param {number} index The index to remove value.
-     * @returns {Type} A Type instance.
-     */
-    removingArrayIndex(path: string, index: number): Type;
-
-    /**
-     * Assuming that the value found at the specified path is an Array-compatible
-     * object, insert a value at the specified index.
-     * @param {string} path The path of the Array-compatible object.
-     * @param {number} index The index to insert value.
-     * @param {*} value Any object.
-     * @returns {Type} A Type instance.
-     */
-    insertingArrayValue(path: string, index: number, value: any): Type;
-
-    /**
      * Update values from some object.
      * @param {Nullable<JSObject<any>>} object A JSObject instance.
      * @returns {Type} A Type instance.
@@ -103,6 +82,13 @@ declare module './object' {
 
   export interface Impl extends Type {
     /**
+     * Clone with a new object.
+     * @param {JSObject<any>} object A JSObject instance.
+     * @returns {Impl} An Impl instance.
+     */
+    _cloneWithNewObject(object: JSObject<any>): Impl;
+
+    /**
      * Map value at a certain path by modifying an external object. This method
      * should not be used anywhere else except internally.
      * @param {JSObject<any>} object The object to modify.
@@ -121,17 +107,6 @@ declare module './object' {
      * @returns {Impl} An Impl instance.
      */
     _updatingValue(object: JSObject<any>, path: string, value: Nullable<any>): Impl;
-
-    /**
-     * Update an inner array with a mapping function by modifying an external
-     * object. This assumes the value at the specified path is either an Array
-     * or an Array-compatible object.
-     * @param {JSObject<any>} object The object to modify.
-     * @param {string} path The path at which to update value.
-     * @param {(v: Array<any>) => Array<any>} arrayFn Array mapper.
-     * @returns {Impl} An Impl instance.
-     */
-    _updatingArray(object: JSObject<any>, path: string, arrayFn: (v: Array<any>) => Array<any>): Impl;
 
     /**
      * Remove value at a by modifying an external object.
@@ -159,6 +134,10 @@ declare module './object' {
     _movingValue(object: JSObject<any>, src: string, dest: string): Impl;
   }
 }
+
+Impl.prototype._cloneWithNewObject = function (object) {
+  return new Impl().copyingPropertiesUnsafely(this).settingObjectUnsafely(object);
+};
 
 Impl.prototype._mappingValue = function (object, path, mapFn) {
   try {
@@ -202,9 +181,7 @@ Impl.prototype._mappingValue = function (object, path, mapFn) {
       currentResult = interValue;
     }
 
-    return new Impl()
-      .copyingPropertiesUnsafely(this)
-      .settingObjectUnsafely(objectCopy);
+    return this._cloneWithNewObject(objectCopy);
   } catch (e) {
     return this.cloneBuilder().build() as Impl;
   }
@@ -212,12 +189,6 @@ Impl.prototype._mappingValue = function (object, path, mapFn) {
 
 Impl.prototype._updatingValue = function (object, path, value) {
   return this._mappingValue(object, path, () => value);
-};
-
-Impl.prototype._updatingArray = function (object, path, arrayFn) {
-  let arrayObject = this._valueAtNode(object, path).getOrElse({});
-  let array = Objects.entries(arrayObject).map(v => v[1]);
-  return this._updatingValue(object, path, arrayFn(array));
 };
 
 Impl.prototype._removingValue = function (object, path) {
@@ -249,18 +220,6 @@ Impl.prototype.updatingValue = function (path, value) {
 
 Impl.prototype.removingValue = function (path) {
   return this._removingValue(this.shallowClonedObject, path);
-};
-
-Impl.prototype.removingArrayIndex = function (path, index) {
-  return this._updatingArray(this.shallowClonedObject, path, v => {
-    v.splice(index, 1); return v;
-  });
-};
-
-Impl.prototype.insertingArrayValue = function (path, index, value) {
-  return this._updatingArray(this.shallowClonedObject, path, v => {
-    v.splice(index, 0, value); return v;
-  });
 };
 
 Impl.prototype.updatingValues = function (object) {

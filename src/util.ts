@@ -22,3 +22,7 @@ export function shallowClone<T>(object: Nullable<T>): Nullable<T> {
     return shallowCloneObject(object) as T;
   }
 }
+
+export function join(sep: string, ...paths: any[]) {
+  return paths.join(sep);
+}

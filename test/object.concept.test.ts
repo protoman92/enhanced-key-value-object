@@ -1,4 +1,3 @@
-import { Collections, Nullable, Numbers } from 'javascriptutilities';
 import * as mockito from 'ts-mockito';
 import { EKVObject } from './../src';
 import { Impl, objectKey, pathSeparatorKey } from './../src/object';
@@ -227,63 +226,6 @@ describe('Complex operations should be implemented correctly', () => {
       'b.d': 2,
       c: 1, d: 2,
     });
-  });
-
-  it('Updating array with undefined/null values at specified path should work', () => {
-    /// Setup
-    let path = 'a.b.c';
-    let state = new Impl();
-
-    /// When
-    state = state._updatingArray({}, path, v => v.concat(1, 2, 3));
-
-    /// Then
-    expect(state.valueAtNode(path).value).toEqual([1, 2, 3]);
-  });
-
-  it('Removing array index should work correctly', () => {
-    /// Setup
-    let array: Nullable<number>[] = [
-      ...Numbers.range(0, 100),
-      undefined, null,
-      ...Numbers.range(0, 100),
-      null, undefined,
-      ...Numbers.range(0, 100),
-    ];
-
-    let path = 'a.b.c';
-    let state = EKVObject.empty();
-    state = state.updatingValue(path, array);
-
-    /// When
-    for (let i = 0; i < 100; i++) {
-      let indexArray = Numbers.range(0, array.length - i);
-      let removedIndex = Collections.randomElement(indexArray).value!;
-      array.splice(removedIndex, 1);
-      state = state.removingArrayIndex(path, removedIndex);
-
-      /// Then
-      array.forEach((v, j) => {
-        let stateValue = state.valueAtNode(`${path}.${j}`);
-
-        if (stateValue.isSuccess()) {
-          expect(stateValue.value).toEqual(v);
-        } else {
-          expect(v === undefined || v === null).toBeTruthy();
-        }
-      });
-    }
-  });
-
-  it('Inserting array value should work correctly', () => {
-    /// Setup
-    let state = EKVObject.just({ a: [1, 2, 3] });
-
-    /// When
-    state = state.insertingArrayValue('a', 1, 0);
-
-    /// Then
-    expect(state.valueAtNode('a').value).toEqual([1, 0, 2, 3]);
   });
 
   it('Swapping values should work correctly', () => {
