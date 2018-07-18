@@ -1,5 +1,6 @@
 import { Impl } from './object';
 import { just } from './object+utility';
+type EqualFn = (v1: any, v2: any) => boolean;
 
 declare module './object' {
   export interface Type {
@@ -7,14 +8,10 @@ declare module './object' {
      * Check if two objects are equal in values for the specified keys.
      * @param {EKVObjectType} object An EKVObjectType instance.
      * @param {string[]} paths The paths to check for equality.
-     * @param {(v1: any, v2: any) => boolean} [equalFn] Equality function.
+     * @param {EqualFn} [equalFn] Equality function.
      * @returns {boolean} A boolean value.
      */
-    equalsForValues(
-      object: EKVObjectType,
-      paths: string[],
-      equalFn?: (v1: any, v2: any) => boolean,
-    ): boolean;
+    equalsForValues(object: EKVObjectType, paths: string[], equalFn?: EqualFn): boolean;
   }
 
   export interface Impl extends Type { }
