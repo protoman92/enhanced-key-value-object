@@ -1,4 +1,4 @@
-import { Try } from 'javascriptutilities';
+import { Try, JSObject } from 'javascriptutilities';
 import { Impl } from './object';
 type CompareFn = (v1: any, v2: any) => boolean;
 
@@ -15,12 +15,33 @@ declare module './object' {
     compareValues(lhs: string, rhs: string, compareFn?: CompareFn): Try<boolean>;
   }
 
-  export interface Impl extends Type { }
+  export interface Impl extends Type {
+    /**
+     * Compare values found at two paths of an external object with a comparison
+     * function.
+     * @param {JSObject<any>} object External object.
+     * @param {string} lhs Path at which the lhs value is found.
+     * @param {string} rhs Path at which the rhs value is found.
+     * @param {CompareFn} [compareFn] Comparison function
+     * which defaults to equality if not specified.
+     * @returns {Try<boolean>} A Try instance.
+     */
+    _compareValues(
+      object: JSObject<any>,
+      lhs: string,
+      rhs: string,
+      compareFn?: CompareFn,
+    ): Try<boolean>;
+  }
 }
 
-Impl.prototype.compareValues = function (lhs, rhs, fn) {
+Impl.prototype._compareValues = function (object, lhs, rhs, fn) {
   let compareFn = fn || ((v1, v2) => v1 === v2);
 
-  return this.valueAtNode(lhs)
-    .zipWith(this.valueAtNode(rhs), (v1, v2) => compareFn(v1, v2));
+  return this._valueAtNode(object, lhs)
+    .zipWith(this._valueAtNode(object, rhs), (v1, v2) => compareFn(v1, v2));
+};
+
+Impl.prototype.compareValues = function (lhs, rhs, fn) {
+  return this._compareValues(this.actualObject, lhs, rhs, fn);
 };
