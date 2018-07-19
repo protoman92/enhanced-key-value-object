@@ -1,9 +1,9 @@
 import { Collections, JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
 import { Impl } from './object';
 import { join } from './util';
-
 export type EKVMapFn = (value: Try<any>) => TryResult<any>;
 export type EKVRawMapFn = (value: Nullable<any>) => Nullable<any>;
+type CompareFn = (v1: any, v2: any) => boolean;
 
 declare module './object' {
   export interface Type {
@@ -17,6 +17,18 @@ declare module './object' {
      * @returns {Type} A Type instance.
      */
     removingArrayIndex(path: string, index: number): Type;
+
+    /**
+     * Check if the object found at the specified path, and if it is, upsert
+     * a value there dependending on whether there is any object that equals it
+     * in some way.
+     * @param {string} path The path of the Array-compatible object.
+     * @param {*} object Any object.
+     * @param {CompareFn} [compareFn] Comparison function that defauls to
+     * equality check.
+     * @returns {Type} A Type instance.
+     */
+    upsertingInArray(path: string, object: any, compareFn?: CompareFn): Type;
   }
 
   export interface Impl extends Type {
@@ -46,7 +58,7 @@ Impl.prototype._updatingArray = function (object, path, arrayFn) {
     return arrayFn(object, -1);
   } else {
     try {
-      let lastKey = Collections.last(Object.keys(arrayObject)).getOrThrow();
+      let lastKey = Collections.last(keys).getOrThrow();
       let lastIndex = parseInt(lastKey, undefined);
 
       if (!isNaN(lastIndex)) {
@@ -74,5 +86,30 @@ Impl.prototype.removingArrayIndex = function (path, index) {
     } else {
       return this._removingValue(v, buildPath(index));
     }
+  });
+};
+
+Impl.prototype.upsertingInArray = function (path, value, fn) {
+  let compareFn = fn || ((v1: any, v2: any) => v1 === v2);
+
+  return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
+    let newState = this;
+    let buildPath = (i: number) => join(this.pathSeparator, path, i);
+
+    for (let i = 0; i < lastIndex; i++) {
+      let indexPath = buildPath(i);
+      let valueAtIndex = this._valueAtNode(v, indexPath).value;
+
+      if (valueAtIndex !== undefined && valueAtIndex !== null) {
+        if (compareFn(valueAtIndex, value)) {
+          return newState._updatingValue(v, indexPath, value);
+        }
+      } else {
+        continue;
+      }
+    }
+
+    let lastIndexPath = buildPath(lastIndex + 1);
+    return newState._updatingValue(v, lastIndexPath, value);
   });
 };
