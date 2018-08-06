@@ -74,18 +74,17 @@ Impl.prototype.removingArrayIndex = function (path, index) {
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
     let sep = this.pathSeparator;
     let buildPath = (i: number) => join(sep, path, i);
+    let newState = this;
 
-    if (index < lastIndex) {
-      let newState = this._removingValue(v, buildPath(index));
-
-      for (let i = index; i < lastIndex; i++) {
+    for (let i = index; i <= lastIndex; i++) {
+      if (i === lastIndex) {
+        newState = newState._removingValue(v, buildPath(i));
+      } else {
         newState = newState._movingValue(v, buildPath(i + 1), buildPath(i));
       }
-
-      return newState;
-    } else {
-      return this._removingValue(v, buildPath(index));
     }
+
+    return newState;
   });
 };
 
@@ -96,7 +95,7 @@ Impl.prototype.upsertingInArray = function (path, value, fn) {
     let newState = this;
     let buildPath = (i: number) => join(this.pathSeparator, path, i);
 
-    for (let i = 0; i < lastIndex; i++) {
+    for (let i = 0; i <= lastIndex; i++) {
       let indexPath = buildPath(i);
       let valueAtIndex = this._valueAtNode(v, indexPath).value;
 
