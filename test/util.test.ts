@@ -13,7 +13,7 @@ describe('Utilities should be implemented correctly', () => {
     expect(clonedUndefined).toBeUndefined();
 
     /// Setup && When && Then
-    let object: JSObject<any> = {};
+    let object: JSObject<unknown> = {};
     let clonedObject = Util.shallowClone(object);
     object.a = 1;
     expect(clonedObject!.a).toBeFalsy();

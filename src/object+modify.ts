@@ -3,9 +3,8 @@ import { Impl, Type } from './object';
 import { empty } from './object+utility';
 import { DeleteKey, DELETE_KEY } from './param';
 import { shallowClone, shallowCloneObject } from './util';
-
-export type EKVMapFn = (value: Try<any>) => TryResult<any>;
-export type EKVRawMapFn = (value: Nullable<any>) => Nullable<any>;
+export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
+export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
 
 declare module './object' {
   export interface Type {
@@ -26,10 +25,10 @@ declare module './object' {
     /**
      * Update value at a certain path.
      * @param {string} path The path at which to update value.
-     * @param {Nullable<any>} value Any value.
+     * @param {Nullable<unknown>} value Unknown value.
      * @returns {Type} A Type instance.
      */
-    updatingValue(path: string, value: Nullable<any>): Type;
+    updatingValue(path: string, value: Nullable<unknown>): Type;
 
     /**
      * Remove value at a certain path.
@@ -40,20 +39,20 @@ declare module './object' {
 
     /**
      * Update values from some object.
-     * @param {Nullable<JSObject<any>>} object A JSObject instance.
+     * @param {Nullable<JSObject<unknown>>} object A JSObject instance.
      * @returns {Type} A Type instance.
      */
-    updatingValues(object: Nullable<JSObject<any>>): Type;
+    updatingValues(object: Nullable<JSObject<unknown>>): Type;
 
     /**
      * Assuming that each key in the external object consists of subkeys joined
      * by a separator, update the current object with values from said keys.
-     * @param {JSObject<any>} values A JSObject instance.
+     * @param {JSObject<unknown>} values A JSObject instance.
      * @param {string} [separator] Optional separator, defaults to the inner
      * path separator.
      * @returns {Type} A Type instance.
      */
-    updatingValuesWithFullPaths(values: JSObject<any>, separator?: string): Type;
+    updatingValuesWithFullPaths(values: JSObject<unknown>, separator?: string): Type;
 
     /**
      * Copy value from one node to another.
@@ -83,38 +82,38 @@ declare module './object' {
   export interface Impl extends Type {
     /**
      * Clone with a new object.
-     * @param {JSObject<any>} object A JSObject instance.
+     * @param {JSObject<unknown>} object A JSObject instance.
      * @returns {Impl} An Impl instance.
      */
-    _cloneWithNewObject(object: JSObject<any>): Impl;
+    _cloneWithNewObject(object: JSObject<unknown>): Impl;
 
     /**
      * Map value at a certain path by modifying an external object. This method
      * should not be used anywhere else except internally.
-     * @param {JSObject<any>} object The object to modify.
+     * @param {JSObject<unknown>} object The object to modify.
      * @param {string} path The path at which to update value.
      * @param {EKVRawMapFn} mapFn Mapping function.
      * @returns {Impl} An Impl instance.
      */
-    _mappingValue(object: JSObject<any>, path: string, mapFn: EKVRawMapFn): Impl;
+    _mappingValue(object: JSObject<unknown>, path: string, mapFn: EKVRawMapFn): Impl;
 
     /**
      * Update value at a certain path by modifying an external object. This
      * method should not be used anywhere else except internally.
-     * @param {JSObject<any>} object The object to modify.
+     * @param {JSObject<unknown>} object The object to modify.
      * @param {string} path The path at which to update value.
-     * @param {Nullable<any>} value Any value.
+     * @param {Nullable<unknown>} value Unknown value.
      * @returns {Impl} An Impl instance.
      */
-    _updatingValue(object: JSObject<any>, path: string, value: Nullable<any>): Impl;
+    _updatingValue(object: JSObject<unknown>, path: string, value: Nullable<unknown>): Impl;
 
     /**
      * Remove value at a by modifying an external object.
-     * @param {JSObject<any>} object The object to modify.
+     * @param {JSObject<unknown>} object The object to modify.
      * @param {string} path The path at which to remove value.
      * @returns {Impl} An Impl instance.
      */
-    _removingValue(object: JSObject<any>, path: string): Impl;
+    _removingValue(object: JSObject<unknown>, path: string): Impl;
 
     /**
      * Copy value from one node to another by modifying an external object.
@@ -126,12 +125,12 @@ declare module './object' {
 
     /**
      * Move value from one node to another by modifying an external object.
-     * @param {JSObject<any>} object The object to modify.
+     * @param {JSObject<unknown>} object The object to modify.
      * @param {string} src The source path.
      * @param {string} dest The destination path.
      * @returns {Type} An Impl instance.
      */
-    _movingValue(object: JSObject<any>, src: string, dest: string): Impl;
+    _movingValue(object: JSObject<unknown>, src: string, dest: string): Impl;
   }
 }
 
@@ -143,7 +142,7 @@ Impl.prototype._mappingValue = function (object, path, mapFn) {
   try {
     let subpaths = path.split(this.pathSeparator);
     let objectCopy = object;
-    let currentResult = objectCopy;
+    let currentResult: any = objectCopy;
 
     for (let i = 0, length = subpaths.length; i < length; i++) {
       let subpath = subpaths[i];

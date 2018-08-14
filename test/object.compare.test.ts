@@ -9,8 +9,12 @@ describe('Compare operations should be implemented correctly', () => {
     /// When && Then
     expect(ekvObject.compareValues('a', 'b').value).toBeFalsy();
     expect(ekvObject.compareValues('a', 'c', deepEqual).value).toBeTruthy();
-    expect(ekvObject.compareValues('a', 'b', (v1, v2) => v1 < v2).value).toBeTruthy();
-    expect(ekvObject.compareValues('b', 'c', (v1, v2) => v1 > v2).value).toBeTruthy();
+    expect(ekvObject.compareValues('a', 'b', (v1, v2) => {
+      return (v1 as any) < (v2 as any);
+    }).value).toBeTruthy();
+    expect(ekvObject.compareValues('b', 'c', (v1, v2) => {
+      return (v1 as any) > (v2 as any);
+    }).value).toBeTruthy();
     expect(ekvObject.compareValues('a', 'd').isFailure()).toBeTruthy();
   });
 });

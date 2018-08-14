@@ -1,6 +1,6 @@
 import { Try, JSObject } from 'javascriptutilities';
 import { Impl } from './object';
-type CompareFn = (v1: any, v2: any) => boolean;
+type CompareFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
   export interface Type {
@@ -19,7 +19,7 @@ declare module './object' {
     /**
      * Compare values found at two paths of an external object with a comparison
      * function.
-     * @param {JSObject<any>} object External object.
+     * @param {JSObject<unknown>} object External object.
      * @param {string} lhs Path at which the lhs value is found.
      * @param {string} rhs Path at which the rhs value is found.
      * @param {CompareFn} [compareFn] Comparison function
@@ -27,7 +27,7 @@ declare module './object' {
      * @returns {Try<boolean>} A Try instance.
      */
     _compareValues(
-      object: JSObject<any>,
+      object: JSObject<unknown>,
       lhs: string,
       rhs: string,
       compareFn?: CompareFn,

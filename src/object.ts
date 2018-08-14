@@ -1,7 +1,7 @@
 import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
 import { shallowCloneObject } from './util';
 
-export type EKVObjectType = Type | JSObject<any>;
+export type EKVObjectType = Type | JSObject<unknown>;
 export let objectKey: keyof Impl = '_object';
 export let pathSeparatorKey: keyof Impl = '_pathSeparator';
 
@@ -9,12 +9,12 @@ export interface Type extends BuildableType<Builder> {
   /**
    * Deep clone the inner object.
    */
-  readonly deepClonedObject: JSObject<any>;
+  readonly deepClonedObject: JSObject<unknown>;
   readonly pathSeparator: string;
 }
 
 export class Impl implements Type {
-  public _object: JSObject<any>;
+  public _object: JSObject<unknown>;
   public _pathSeparator: string;
 
   public constructor() {
@@ -22,15 +22,15 @@ export class Impl implements Type {
     this._pathSeparator = '.';
   }
 
-  public get actualObject(): JSObject<any> {
+  public get actualObject(): JSObject<unknown> {
     return this._object;
   }
 
-  public get shallowClonedObject(): JSObject<any> {
+  public get shallowClonedObject(): JSObject<unknown> {
     return shallowCloneObject(this._object);
   }
 
-  public get deepClonedObject(): JSObject<any> {
+  public get deepClonedObject(): JSObject<unknown> {
     return JSON.parse(JSON.stringify(this._object, (_k, v) => {
       return v === undefined ? null : v;
     }));
@@ -48,7 +48,7 @@ export class Impl implements Type {
     return this.builder().withBuildable(this);
   }
 
-  public settingObjectUnsafely(object: JSObject<any>) {
+  public settingObjectUnsafely(object: JSObject<unknown>) {
     this._object = object;
     return this;
   }
@@ -72,7 +72,7 @@ export class Builder implements BuilderType<Type> {
     this.object = new Impl();
   }
 
-  public withObject(object: JSObject<any>, mode: 'safe' | 'unsafe' = 'safe') {
+  public withObject(object: JSObject<unknown>, mode: 'safe' | 'unsafe' = 'safe') {
     if (object !== undefined && object !== null) {
       switch (mode) {
         case 'unsafe':

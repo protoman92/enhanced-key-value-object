@@ -1,6 +1,6 @@
 import { Impl } from './object';
 import { just } from './object+utility';
-type EqualFn = (v1: any, v2: any) => boolean;
+type EqualFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
   export interface Type {
@@ -19,7 +19,7 @@ declare module './object' {
 
 Impl.prototype.equalsForValues = function (object, paths, equalFn?) {
   let compareFn = equalFn !== undefined && equalFn !== null ? equalFn
-    : (v1: any, v2: any) => v1 === v2;
+    : (v1: unknown, v2: unknown) => v1 === v2;
 
   let rhsObject = just(object);
 

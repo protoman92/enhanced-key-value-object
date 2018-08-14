@@ -1,9 +1,9 @@
 import { Collections, JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
 import { Impl } from './object';
 import { join } from './util';
-export type EKVMapFn = (value: Try<any>) => TryResult<any>;
-export type EKVRawMapFn = (value: Nullable<any>) => Nullable<any>;
-type CompareFn = (v1: any, v2: any) => boolean;
+export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
+export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
+type CompareFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
   export interface Type {
@@ -23,12 +23,12 @@ declare module './object' {
      * a value there dependending on whether there is any object that equals it
      * in some way.
      * @param {string} path The path of the Array-compatible object.
-     * @param {*} object Any object.
+     * @param {unknown} object Unknown object.
      * @param {CompareFn} [compareFn] Comparison function that defauls to
      * equality check.
      * @returns {Type} A Type instance.
      */
-    upsertingInArray(path: string, object: any, compareFn?: CompareFn): Type;
+    upsertingInArray(path: string, object: unknown, compareFn?: CompareFn): Type;
   }
 
   export interface Impl extends Type {
@@ -36,22 +36,25 @@ declare module './object' {
      * Update an inner array with a mapping function by modifying an external
      * object. This assumes the value at the specified path is either an Array
      * or an Array-compatible object.
-     * @param {JSObject<any>} object The object to modify.
+     * @param {JSObject<unknown>} object The object to modify.
      * @param {string} path The path at which to update value.
-     * @param {(object: JSObject<any>, lastIndex: number) => Impl} arrayFn
+     * @param {(object: JSObject<unknown>, lastIndex: number) => Impl} arrayFn
      * Array index side effect. This may mutate the parameter object.
      * @returns {Impl} An Impl instance.
      */
     _updatingArray(
-      object: JSObject<any>,
+      object: JSObject<unknown>,
       path: string,
-      arrayFn: (object: JSObject<any>, lastIndex: number) => Impl,
+      arrayFn: (object: JSObject<unknown>, lastIndex: number) => Impl,
     ): Impl;
   }
 }
 
 Impl.prototype._updatingArray = function (object, path, arrayFn) {
-  let arrayObject = this._valueAtNode(object, path).getOrElse({});
+  let arrayObject = this._valueAtNode(object, path).map(v => {
+    return v instanceof Object ? v : {};
+  }).getOrElse(() => ({}));
+
   let keys = Object.keys(arrayObject);
 
   if (keys.length === 0) {
@@ -89,7 +92,7 @@ Impl.prototype.removingArrayIndex = function (path, index) {
 };
 
 Impl.prototype.upsertingInArray = function (path, value, fn) {
-  let compareFn = fn || ((v1: any, v2: any) => v1 === v2);
+  let compareFn = fn || ((v1: unknown, v2: unknown) => v1 === v2);
 
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
     let newState = this;

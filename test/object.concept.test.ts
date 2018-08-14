@@ -34,14 +34,26 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 
   it('Accessing path with value should work correctly', () => {
     /// Setup && When
-    let value1 = ekvObject.numberAtNode('a.a1_1.a2_3').value;
-    let value2 = ekvObject.booleanAtNode('c').value;
-    let value3 = ekvObject.stringAtNode('d').value;
+    let value1Number = ekvObject.numberAtNode('a.a1_1.a2_3').value;
+    let value1Boolean = ekvObject.booleanAtNode('a.a1_1.a2_3').value;
+    let value1String = ekvObject.stringAtNode('a.a1_1.a2_3').value;
+    let value2Boolean = ekvObject.booleanAtNode('c').value;
+    let value2Number = ekvObject.numberAtNode('c').value;
+    let value2String = ekvObject.stringAtNode('c').value;
+    let value3String = ekvObject.stringAtNode('d').value;
+    let value3Boolean = ekvObject.booleanAtNode('d').value;
+    let value3Number = ekvObject.numberAtNode('d').value;
 
     /// Then
-    expect(value1).toBe(3);
-    expect(value2).toBe(true);
-    expect(value3).toBe('d');
+    expect(value1Number).toBe(3);
+    expect(value1Boolean).toBeUndefined();
+    expect(value1String).toBeUndefined();
+    expect(value2Boolean).toBe(true);
+    expect(value2Number).toBeUndefined();
+    expect(value2String).toBeUndefined();
+    expect(value3String).toBe('d');
+    expect(value3Boolean).toBeUndefined();
+    expect(value3Number).toBeUndefined();
   });
 
   it('Accessing path with thrown error should work correctly', () => {
@@ -204,7 +216,7 @@ describe('Utilities should be implemented correctly', () => {
     let deepCloned = ekvObject.deepClonedObject;
 
     /// Then
-    expect(deepCloned.a.b).toBeNull();
+    expect((deepCloned as any).a.b).toBeNull();
     expect(deepCloned.b).toBeNull();
   });
 });

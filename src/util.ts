@@ -17,7 +17,7 @@ export function shallowClone<T>(object: Nullable<T>): Nullable<T> {
   ) {
     return object;
   } else if (object instanceof Array) {
-    return object.map(v => v) as any;
+    return [...object] as any;
   } else {
     return shallowCloneObject(object) as T;
   }

@@ -85,7 +85,7 @@ describe('Array operations should be implemented correctly', () => {
     state = state.removingArrayIndex('a', itemCount - 1);
 
     /// Then
-    expect(Object.keys(state.valueAtNode('a').value)).toHaveLength(itemCount - 1);
+    expect(Object.keys(state.valueAtNode('a').value as {})).toHaveLength(itemCount - 1);
   });
 
   it('Upserting in array - should work correctly', () => {
@@ -100,12 +100,9 @@ describe('Array operations should be implemented correctly', () => {
 
     /// Then
     let buildPath = (i: number) => `${path}.${i}`;
-    expect(Object.keys(state1.valueAtNode(path).value)).toHaveLength(array.length);
-    expect(Object.keys(state2.valueAtNode(path).value)).toHaveLength(array.length + 1);
-
-    array.forEach((v, i) => {
-      expect(state1.valueAtNode(buildPath(i)).value).toEqual(v);
-    });
+    expect(Object.keys(state1.valueAtNode(path).value as {})).toHaveLength(array.length);
+    expect(Object.keys(state2.valueAtNode(path).value as {})).toHaveLength(array.length + 1);
+    array.forEach((v, i) => expect(state1.valueAtNode(buildPath(i)).value).toEqual(v));
 
     array.concat([8]).forEach((v, i) => {
       expect(state2.valueAtNode(buildPath(i)).value).toEqual(v);
@@ -125,11 +122,8 @@ describe('Array operations should be implemented correctly', () => {
 
     /// Then
     let buildPath = (i: number) => `${path}.${i}`;
-    expect(Object.keys(state.valueAtNode(path).value)).toHaveLength(array.length);
-
-    array.forEach((v, i) => {
-      expect(state.valueAtNode(buildPath(i)).value).toEqual(v);
-    });
+    expect(Object.keys(state.valueAtNode(path).value as {})).toHaveLength(array.length);
+    array.forEach((v, i) => expect(state.valueAtNode(buildPath(i)).value).toEqual(v));
   });
 
   it('Upserting in array with invalid array - should create array', () => {
@@ -141,7 +135,7 @@ describe('Array operations should be implemented correctly', () => {
     state = state.upsertingInArray(path, 10);
 
     /// Then
-    expect(Object.keys(state.valueAtNode(path).value)).toHaveLength(1);
+    expect(Object.keys(state.valueAtNode(path).value as {})).toHaveLength(1);
     expect(state.valueAtNode(`${path}.0`).value).toEqual(10);
   });
 
