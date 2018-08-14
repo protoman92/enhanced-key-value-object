@@ -28,9 +28,9 @@ declare module './object' {
     /**
      * Access a possible Object at a path.
      * @param {string} path The path at which to access the value.
-     * @returns {Try<Object>} A Try instance.
+     * @returns {Try<{}>} A Try instance.
      */
-    objectAtNode(path: string): Try<Object>;
+    objectAtNode(path: string): Try<{}>;
 
     /**
      * Access a possible string value at a path.
