@@ -26,6 +26,13 @@ declare module './object' {
     numberAtNode(path: string): Try<number>;
 
     /**
+     * Access a possible Object at a path.
+     * @param {string} path The path at which to access the value.
+     * @returns {Try<Object>} A Try instance.
+     */
+    objectAtNode(path: string): Try<Object>;
+
+    /**
      * Access a possible string value at a path.
      * @param {string} path The path at which to access the value.
      * @returns {Try<string>} A Try instance.
@@ -78,33 +85,19 @@ Impl.prototype.valueAtNode = function (path) {
 };
 
 Impl.prototype.booleanAtNode = function (path) {
-  return this.valueAtNode(path).map(v => {
-    if (typeof v === 'boolean') {
-      return v;
-    } else {
-      throw new Error(`No boolean found at ${path}`);
-    }
-  });
+  return this.valueAtNode(path).booleanOrFail(() => `No boolean found at ${path}`);
 };
 
 Impl.prototype.numberAtNode = function (path: string) {
-  return this.valueAtNode(path).map(v => {
-    if (typeof v === 'number') {
-      return v;
-    } else {
-      throw new Error(`No number found at ${path}`);
-    }
-  });
+  return this.valueAtNode(path).numberOrFail(() => `No number found at ${path}`);
 };
 
 Impl.prototype.stringAtNode = function (path: string) {
-  return this.valueAtNode(path).map(v => {
-    if (typeof v === 'string') {
-      return v;
-    } else {
-      throw new Error(`No string found at ${path}`);
-    }
-  });
+  return this.valueAtNode(path).stringOrFail(() => `No string found at ${path}`);
+};
+
+Impl.prototype.objectAtNode = function (path: string) {
+  return this.valueAtNode(path).objectOrFail(() => `No object found at ${path}`);
 };
 
 Impl.prototype.valuesWithFullPaths = function (separator?) {
