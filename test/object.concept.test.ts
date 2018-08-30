@@ -1,12 +1,12 @@
 import * as mockito from 'ts-mockito';
-import { EKVObject } from './../src';
-import { Impl, objectKey, pathSeparatorKey } from './../src/object';
+import {EKVObject} from './../src';
+import {Impl, objectKey, pathSeparatorKey} from './../src/object';
 let deepEqual = require('deep-equal');
 
 describe('Enhanced key-value object should be implemented correctly', () => {
   let object = {
-    a: { a1_1: { a2_1: 1, a2_2: 2, a2_3: 3, a2_4: [] }, a1_2: 1 },
-    b: { b1_1: { b2_1: 4, b2_2: 5, b2_3: 6 }, b1_2: 2 },
+    a: {a1_1: {a2_1: 1, a2_2: 2, a2_3: 3, a2_4: []}, a1_2: 1},
+    b: {b1_1: {b2_1: 4, b2_2: 5, b2_3: 6}, b1_2: 2},
     c: true,
     d: 'd',
   };
@@ -97,7 +97,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 
   it('Updating with external object should work', () => {
     /// Setup
-    let otherObject = { e: { f: { g: 1 } } };
+    let otherObject = {e: {f: {g: 1}}};
 
     /// When
     let updatedObject = ekvObject.updatingValues(otherObject);
@@ -129,7 +129,11 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     /// When && Then
     expect(ekvObject.equalsForValues(ekvObject, paths)).toBeTruthy();
     expect(ekvObject.equalsForValues(ekvObject, paths, deepEqual)).toBeTruthy();
-    expect(ekvObject.equalsForValues(ekvObject, paths, () => { throw ''; })).toBeFalsy();
+    expect(
+      ekvObject.equalsForValues(ekvObject, paths, () => {
+        throw '';
+      })
+    ).toBeFalsy();
     expect(ekvObject.equalsForValues(ekvObject1, paths, deepEqual)).toBeFalsy();
   });
 
@@ -138,7 +142,9 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let paths = ['non_existent'];
     let spiedObject = mockito.spy(ekvObject);
     let actualObject = mockito.instance(spiedObject);
-    mockito.when(spiedObject.valueAtNode(mockito.anyString())).thenThrow(new Error(''));
+    mockito
+      .when(spiedObject.valueAtNode(mockito.anyString()))
+      .thenThrow(new Error(''));
 
     /// When && Then
     expect(actualObject.equalsForValues(ekvObject, paths)).toBeFalsy();
@@ -152,8 +158,11 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     let cloned = ekvObject.cloningForPaths(...paths);
 
     /// Then
-    paths.forEach(v => expect(cloned.valueAtNode(v).value)
-      .toEqual(ekvObject.valueAtNode(v).value));
+    paths.forEach(v =>
+      expect(cloned.valueAtNode(v).value).toEqual(
+        ekvObject.valueAtNode(v).value
+      )
+    );
 
     expect(cloned.valueAtNode('c').isFailure()).toBeTruthy();
   });
@@ -179,15 +188,25 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 describe('Utilities should be implemented correctly', () => {
   it('Constructing object with just should work correctly', () => {
     /// Setup
-    let innerObject = { a: 1, b: 2, c: 3 };
-    let possibleObject1 = { [objectKey]: undefined };
-    let possibleObject2 = { [objectKey]: innerObject, [pathSeparatorKey]: 1 };
-    let possibleObject3 = { [objectKey]: innerObject, [pathSeparatorKey]: '/' };
+    let innerObject = {a: 1, b: 2, c: 3};
+    let possibleObject1 = {[objectKey]: undefined};
+    let possibleObject2 = {[objectKey]: innerObject, [pathSeparatorKey]: 1};
+    let possibleObject3 = {[objectKey]: innerObject, [pathSeparatorKey]: '/'};
 
     /// When && Then
-    expect(EKVObject.just(possibleObject1).valueAtNode('a').isFailure()).toBeTruthy();
-    expect(EKVObject.just(possibleObject2).valueAtNode('a').isFailure()).toBeTruthy();
-    expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(innerObject.a);
+    expect(
+      EKVObject.just(possibleObject1)
+        .valueAtNode('a')
+        .isFailure()
+    ).toBeTruthy();
+    expect(
+      EKVObject.just(possibleObject2)
+        .valueAtNode('a')
+        .isFailure()
+    ).toBeTruthy();
+    expect(EKVObject.just(possibleObject3).valueAtNode('a').value).toBe(
+      innerObject.a
+    );
     expect(EKVObject.just(undefined).deepClonedObject).toEqual({});
 
     let unsafeClone = EKVObject.just(possibleObject3, 'unsafe');
@@ -197,7 +216,7 @@ describe('Utilities should be implemented correctly', () => {
 
   it('Deep cloning inner object should replace undefined with null', () => {
     /// Setup
-    let ekvObject = EKVObject.just({ a: { b: undefined }, b: null }, 'unsafe');
+    let ekvObject = EKVObject.just({a: {b: undefined}, b: null}, 'unsafe');
 
     /// When
     let deepCloned = ekvObject.deepClonedObject;
@@ -211,7 +230,7 @@ describe('Utilities should be implemented correctly', () => {
 describe('Complex operations should be implemented correctly', () => {
   it('Accessing values with full paths should work correctly', () => {
     /// Setup
-    let object = { a: [{ a: 1 }, { b: 2 }], b: { c: 1, d: 2 }, c: 1, d: 2 };
+    let object = {a: [{a: 1}, {b: 2}], b: {c: 1, d: 2}, c: 1, d: 2};
     let ekvObject = EKVObject.just(object);
 
     /// When
@@ -223,18 +242,19 @@ describe('Complex operations should be implemented correctly', () => {
       'a.1.b': 2,
       'b.c': 1,
       'b.d': 2,
-      c: 1, d: 2,
+      c: 1,
+      d: 2,
     });
   });
 
   it('Swapping values should work correctly', () => {
     /// Setup
-    let state = EKVObject.just({ a: { b: 1 }, b: { a: 2 } });
+    let state = EKVObject.just({a: {b: 1}, b: {a: 2}});
 
     /// When
     state = state.swappingValue('a.b', 'b.a');
 
     /// Then
-    expect(state.deepClonedObject).toEqual({ a: { b: 2 }, b: { a: 1 } });
+    expect(state.deepClonedObject).toEqual({a: {b: 2}, b: {a: 1}});
   });
 });

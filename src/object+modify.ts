@@ -1,8 +1,8 @@
-import { JSObject, Nullable, Objects, Try, TryResult } from 'javascriptutilities';
-import { Impl, Type } from './object';
-import { empty } from './object+utility';
-import { DeleteKey, DELETE_KEY } from './param';
-import { shallowClone, shallowCloneObject } from './util';
+import {JSObject, Nullable, Objects, Try, TryResult} from 'javascriptutilities';
+import {Impl, Type} from './object';
+import {empty} from './object+utility';
+import {DeleteKey, DELETE_KEY} from './param';
+import {shallowClone, shallowCloneObject} from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
 export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
 
@@ -52,7 +52,10 @@ declare module './object' {
      * path separator.
      * @returns {Type} A Type instance.
      */
-    updatingValuesWithFullPaths(values: JSObject<unknown>, separator?: string): Type;
+    updatingValuesWithFullPaths(
+      values: JSObject<unknown>,
+      separator?: string
+    ): Type;
 
     /**
      * Copy value from one node to another.
@@ -95,7 +98,11 @@ declare module './object' {
      * @param {EKVRawMapFn} mapFn Mapping function.
      * @returns {Impl} An Impl instance.
      */
-    _mappingValue(object: JSObject<unknown>, path: string, mapFn: EKVRawMapFn): Impl;
+    _mappingValue(
+      object: JSObject<unknown>,
+      path: string,
+      mapFn: EKVRawMapFn
+    ): Impl;
 
     /**
      * Update value at a certain path by modifying an external object. This
@@ -105,7 +112,11 @@ declare module './object' {
      * @param {Nullable<unknown>} value Unknown value.
      * @returns {Impl} An Impl instance.
      */
-    _updatingValue(object: JSObject<unknown>, path: string, value: Nullable<unknown>): Impl;
+    _updatingValue(
+      object: JSObject<unknown>,
+      path: string,
+      value: Nullable<unknown>
+    ): Impl;
 
     /**
      * Remove value at a by modifying an external object.
@@ -134,11 +145,13 @@ declare module './object' {
   }
 }
 
-Impl.prototype._cloneWithNewObject = function (object) {
-  return new Impl().copyingPropertiesUnsafely(this).settingObjectUnsafely(object);
+Impl.prototype._cloneWithNewObject = function(object) {
+  return new Impl()
+    .copyingPropertiesUnsafely(this)
+    .settingObjectUnsafely(object);
 };
 
-Impl.prototype._mappingValue = function (object, path, mapFn) {
+Impl.prototype._mappingValue = function(object, path, mapFn) {
   try {
     let subpaths = path.split(this.pathSeparator);
     let objectCopy = object;
@@ -186,42 +199,42 @@ Impl.prototype._mappingValue = function (object, path, mapFn) {
   }
 };
 
-Impl.prototype._updatingValue = function (object, path, value) {
+Impl.prototype._updatingValue = function(object, path, value) {
   return this._mappingValue(object, path, () => value);
 };
 
-Impl.prototype._removingValue = function (object, path) {
+Impl.prototype._removingValue = function(object, path) {
   return this._updatingValue(object, path, DELETE_KEY);
 };
 
-Impl.prototype._copyingValue = function (object, src, dest) {
+Impl.prototype._copyingValue = function(object, src, dest) {
   let sourceValue = this._valueAtNode(object, src);
   return this._updatingValue(object, dest, sourceValue.value);
 };
 
-Impl.prototype._movingValue = function (object, src, dest) {
+Impl.prototype._movingValue = function(object, src, dest) {
   return this._copyingValue(object, src, dest)._removingValue(object, src);
 };
 
-Impl.prototype.emptying = function (): Type {
+Impl.prototype.emptying = function(): Type {
   return empty();
 };
 
-Impl.prototype.mappingValue = function (path, mapFn) {
+Impl.prototype.mappingValue = function(path, mapFn) {
   return this._mappingValue(this.shallowClonedObject, path, v => {
     return Try.unwrap(mapFn(Try.unwrap(v))).value;
   });
 };
 
-Impl.prototype.updatingValue = function (path, value) {
+Impl.prototype.updatingValue = function(path, value) {
   return this._updatingValue(this.shallowClonedObject, path, value);
 };
 
-Impl.prototype.removingValue = function (path) {
+Impl.prototype.removingValue = function(path) {
   return this._removingValue(this.shallowClonedObject, path);
 };
 
-Impl.prototype.updatingValues = function (object) {
+Impl.prototype.updatingValues = function(object) {
   try {
     let currentObject = this;
     let clonedTarget = JSON.parse(JSON.stringify(object));
@@ -235,7 +248,7 @@ Impl.prototype.updatingValues = function (object) {
   }
 };
 
-Impl.prototype.updatingValuesWithFullPaths = function (object, separator?) {
+Impl.prototype.updatingValuesWithFullPaths = function(object, separator?) {
   let pathSeparator = this.pathSeparator;
   let sep = separator || pathSeparator;
   let shouldReconstruct = sep !== pathSeparator;
@@ -243,22 +256,24 @@ Impl.prototype.updatingValuesWithFullPaths = function (object, separator?) {
   let resultObject = this.shallowClonedObject;
 
   Objects.entries(object).forEach(([key, value]) => {
-    let actualKey = shouldReconstruct ? key.split(sep).join(pathSeparator) : key;
+    let actualKey = shouldReconstruct
+      ? key.split(sep).join(pathSeparator)
+      : key;
     result = result._updatingValue(resultObject, actualKey, value);
   });
 
   return result;
 };
 
-Impl.prototype.copyingValue = function (src, dest): Type {
+Impl.prototype.copyingValue = function(src, dest): Type {
   return this._copyingValue(this.shallowClonedObject, src, dest);
 };
 
-Impl.prototype.movingValue = function (src, dest) {
+Impl.prototype.movingValue = function(src, dest) {
   return this._movingValue(this.shallowClonedObject, src, dest);
 };
 
-Impl.prototype.swappingValue = function (path1, path2) {
+Impl.prototype.swappingValue = function(path1, path2) {
   let clonedObject = this.shallowClonedObject;
   let value1 = this._valueAtNode(clonedObject, path1).value;
   let value2 = this._valueAtNode(clonedObject, path2).value;

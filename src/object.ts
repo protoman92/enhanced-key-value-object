@@ -1,5 +1,5 @@
-import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
-import { shallowCloneObject } from './util';
+import {BuildableType, BuilderType, JSObject} from 'javascriptutilities';
+import {shallowCloneObject} from './util';
 
 export type EKVObjectType = Type | JSObject<unknown>;
 export let objectKey: keyof Impl = '_object';
@@ -31,9 +31,11 @@ export class Impl implements Type {
   }
 
   public get deepClonedObject(): JSObject<unknown> {
-    return JSON.parse(JSON.stringify(this._object, (_k, v) => {
-      return v === undefined ? null : v;
-    }));
+    return JSON.parse(
+      JSON.stringify(this._object, (_k, v) => {
+        return v === undefined ? null : v;
+      })
+    );
   }
 
   public get pathSeparator(): string {
@@ -59,9 +61,9 @@ export class Impl implements Type {
   }
 
   public copyingPropertiesUnsafely(ekvObject: Impl) {
-    return this
-      .settingObjectUnsafely(ekvObject._object)
-      .settingPathSeparatorUnsafely(ekvObject._pathSeparator);
+    return this.settingObjectUnsafely(
+      ekvObject._object
+    ).settingPathSeparatorUnsafely(ekvObject._pathSeparator);
   }
 }
 
@@ -72,7 +74,10 @@ export class Builder implements BuilderType<Type> {
     this.object = new Impl();
   }
 
-  public withObject(object: JSObject<unknown>, mode: 'safe' | 'unsafe' = 'safe') {
+  public withObject(
+    object: JSObject<unknown>,
+    mode: 'safe' | 'unsafe' = 'safe'
+  ) {
     if (object !== undefined && object !== null) {
       switch (mode) {
         case 'unsafe':
@@ -80,9 +85,13 @@ export class Builder implements BuilderType<Type> {
           break;
 
         default:
-          this.object.settingObjectUnsafely(JSON.parse(JSON.stringify(object, (_k, v) => {
-            return v === undefined ? null : v;
-          })));
+          this.object.settingObjectUnsafely(
+            JSON.parse(
+              JSON.stringify(object, (_k, v) => {
+                return v === undefined ? null : v;
+              })
+            )
+          );
 
           break;
       }

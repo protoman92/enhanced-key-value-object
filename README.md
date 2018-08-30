@@ -10,7 +10,7 @@ Enhanced key-value object with safe property access and immutable modications.
 To use this object:
 
 ```typescript
-import { EKVObject } from 'enhanced-key-value-object';
+import {EKVObject} from 'enhanced-key-value-object';
 
 /// Note that we only expose the object interface for better encapsulation.
 let object: EKVObject.Type = EKVObject.empty();
@@ -22,7 +22,7 @@ To access the value at any node, use:
 object.valueAtNode(string);
 ```
 
-The parameter of this function should be a String whose components are joined with the specified *pathSeparator* (which is by default '.'). For example:
+The parameter of this function should be a String whose components are joined with the specified _pathSeparator_ (which is by default '.'). For example:
 
 ```typescript
 object.valueAtNode('a.b.c.d.e');

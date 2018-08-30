@@ -1,6 +1,6 @@
-import { JSObject, Objects, Try } from 'javascriptutilities';
-import { Impl } from './object';
-import { just } from './object+utility';
+import {JSObject, Objects, Try} from 'javascriptutilities';
+import {Impl} from './object';
+import {just} from './object+utility';
 
 declare module './object' {
   export interface Type {
@@ -59,7 +59,7 @@ declare module './object' {
   }
 }
 
-Impl.prototype._valueAtNode = function (object, path) {
+Impl.prototype._valueAtNode = function(object, path) {
   let subpaths = path.split(this.pathSeparator);
   let currentResult: any = object;
 
@@ -80,27 +80,35 @@ Impl.prototype._valueAtNode = function (object, path) {
   return Try.success(currentResult);
 };
 
-Impl.prototype.valueAtNode = function (path) {
+Impl.prototype.valueAtNode = function(path) {
   return this._valueAtNode(this.actualObject, path);
 };
 
-Impl.prototype.booleanAtNode = function (path) {
-  return this.valueAtNode(path).booleanOrFail(() => `No boolean found at ${path}`);
+Impl.prototype.booleanAtNode = function(path) {
+  return this.valueAtNode(path).booleanOrFail(
+    () => `No boolean found at ${path}`
+  );
 };
 
-Impl.prototype.numberAtNode = function (path: string) {
-  return this.valueAtNode(path).numberOrFail(() => `No number found at ${path}`);
+Impl.prototype.numberAtNode = function(path: string) {
+  return this.valueAtNode(path).numberOrFail(
+    () => `No number found at ${path}`
+  );
 };
 
-Impl.prototype.stringAtNode = function (path: string) {
-  return this.valueAtNode(path).stringOrFail(() => `No string found at ${path}`);
+Impl.prototype.stringAtNode = function(path: string) {
+  return this.valueAtNode(path).stringOrFail(
+    () => `No string found at ${path}`
+  );
 };
 
-Impl.prototype.objectAtNode = function (path: string) {
-  return this.valueAtNode(path).objectOrFail(() => `No object found at ${path}`);
+Impl.prototype.objectAtNode = function(path: string) {
+  return this.valueAtNode(path).objectOrFail(
+    () => `No object found at ${path}`
+  );
 };
 
-Impl.prototype.valuesWithFullPaths = function (separator?) {
+Impl.prototype.valuesWithFullPaths = function(separator?) {
   let result: JSObject<unknown> = {};
   let sep = separator || this.pathSeparator;
 

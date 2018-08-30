@@ -1,5 +1,5 @@
-import { JSObject } from 'javascriptutilities';
-import { EKVObject } from './../src';
+import {JSObject} from 'javascriptutilities';
+import {EKVObject} from './../src';
 
 describe('EK Object should be immutable', () => {
   let object: JSObject<any>;
@@ -22,7 +22,7 @@ describe('EK Object should be immutable', () => {
     /// Setup
     let sourcePath = 'a.b.c';
     let destPath = 'e.f.g.h';
-    ekvObject = ekvObject.updatingValue('a.b.c', { d: 1 });
+    ekvObject = ekvObject.updatingValue('a.b.c', {d: 1});
 
     /// When
     let copied = ekvObject.copyingValue(sourcePath, destPath);

@@ -1,6 +1,12 @@
-import { Collections, JSObject, Nullable, Try, TryResult } from 'javascriptutilities';
-import { Impl } from './object';
-import { join } from './util';
+import {
+  Collections,
+  JSObject,
+  Nullable,
+  Try,
+  TryResult,
+} from 'javascriptutilities';
+import {Impl} from './object';
+import {join} from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
 export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
 type CompareFn = (v1: unknown, v2: unknown) => boolean;
@@ -28,7 +34,11 @@ declare module './object' {
      * equality check.
      * @returns {Type} A Type instance.
      */
-    upsertingInArray(path: string, object: unknown, compareFn?: CompareFn): Type;
+    upsertingInArray(
+      path: string,
+      object: unknown,
+      compareFn?: CompareFn
+    ): Type;
   }
 
   export interface Impl extends Type {
@@ -45,15 +55,17 @@ declare module './object' {
     _updatingArray(
       object: JSObject<unknown>,
       path: string,
-      arrayFn: (object: JSObject<unknown>, lastIndex: number) => Impl,
+      arrayFn: (object: JSObject<unknown>, lastIndex: number) => Impl
     ): Impl;
   }
 }
 
-Impl.prototype._updatingArray = function (object, path, arrayFn) {
-  let arrayObject = this._valueAtNode(object, path).map(v => {
-    return v instanceof Object ? v : {};
-  }).getOrElse(() => ({}));
+Impl.prototype._updatingArray = function(object, path, arrayFn) {
+  let arrayObject = this._valueAtNode(object, path)
+    .map(v => {
+      return v instanceof Object ? v : {};
+    })
+    .getOrElse(() => ({}));
 
   let keys = Object.keys(arrayObject);
 
@@ -67,13 +79,13 @@ Impl.prototype._updatingArray = function (object, path, arrayFn) {
       if (!isNaN(lastIndex)) {
         return arrayFn(object, lastIndex);
       }
-    } catch { }
+    } catch {}
   }
 
   return this.cloneBuilder().build() as Impl;
 };
 
-Impl.prototype.removingArrayIndex = function (path, index) {
+Impl.prototype.removingArrayIndex = function(path, index) {
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
     let sep = this.pathSeparator;
     let buildPath = (i: number) => join(sep, path, i);
@@ -91,7 +103,7 @@ Impl.prototype.removingArrayIndex = function (path, index) {
   });
 };
 
-Impl.prototype.upsertingInArray = function (path, value, fn) {
+Impl.prototype.upsertingInArray = function(path, value, fn) {
   let compareFn = fn || ((v1: unknown, v2: unknown) => v1 === v2);
 
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {

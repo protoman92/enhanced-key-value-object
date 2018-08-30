@@ -1,5 +1,5 @@
-import { JSObject } from 'javascriptutilities';
-import { DeleteKey } from './../src/param';
+import {JSObject} from 'javascriptutilities';
+import {DeleteKey} from './../src/param';
 import * as Util from './../src/util';
 
 describe('Utilities should be implemented correctly', () => {

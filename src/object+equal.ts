@@ -1,5 +1,5 @@
-import { Impl } from './object';
-import { just } from './object+utility';
+import {Impl} from './object';
+import {just} from './object+utility';
 type EqualFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
@@ -11,15 +11,21 @@ declare module './object' {
      * @param {EqualFn} [equalFn] Equality function.
      * @returns {boolean} A boolean value.
      */
-    equalsForValues(object: EKVObjectType, paths: string[], equalFn?: EqualFn): boolean;
+    equalsForValues(
+      object: EKVObjectType,
+      paths: string[],
+      equalFn?: EqualFn
+    ): boolean;
   }
 
-  export interface Impl extends Type { }
+  export interface Impl extends Type {}
 }
 
-Impl.prototype.equalsForValues = function (object, paths, equalFn?) {
-  let compareFn = equalFn !== undefined && equalFn !== null ? equalFn
-    : (v1: unknown, v2: unknown) => v1 === v2;
+Impl.prototype.equalsForValues = function(object, paths, equalFn?) {
+  let compareFn =
+    equalFn !== undefined && equalFn !== null
+      ? equalFn
+      : (v1: unknown, v2: unknown) => v1 === v2;
 
   let rhsObject = just(object);
 
@@ -30,9 +36,10 @@ Impl.prototype.equalsForValues = function (object, paths, equalFn?) {
 
       if (lhsValue.isFailure() && rhsValue.isFailure()) {
         continue;
-      } else if (!lhsValue
-        .zipWith(rhsValue, (v1, v2) => compareFn(v1, v2))
-        .getOrElse(false)
+      } else if (
+        !lhsValue
+          .zipWith(rhsValue, (v1, v2) => compareFn(v1, v2))
+          .getOrElse(false)
       ) {
         return false;
       }

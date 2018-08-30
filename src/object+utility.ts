@@ -1,5 +1,12 @@
-import { Nullable } from 'javascriptutilities';
-import { Builder, EKVObjectType, Impl, objectKey, pathSeparatorKey, Type } from './object';
+import {Nullable} from 'javascriptutilities';
+import {
+  Builder,
+  EKVObjectType,
+  Impl,
+  objectKey,
+  pathSeparatorKey,
+  Type,
+} from './object';
 
 /**
  * Create a new builder object.
@@ -24,7 +31,10 @@ export function empty(): Type {
  * before they are set, and otherwise for unsafe mode.
  * @returns {Type} A Type instance.
  */
-export function just(object: Nullable<EKVObjectType>, mode: 'safe' | 'unsafe' = 'safe'): Type {
+export function just(
+  object: Nullable<EKVObjectType>,
+  mode: 'safe' | 'unsafe' = 'safe'
+): Type {
   if (object !== undefined && object !== null) {
     if (object instanceof Impl) {
       return object;
@@ -42,7 +52,9 @@ export function just(object: Nullable<EKVObjectType>, mode: 'safe' | 'unsafe' = 
           .withPathSeparator(pathSeparator)
           .build();
       } else {
-        return builder().withObject(object, mode).build();
+        return builder()
+          .withObject(object, mode)
+          .build();
       }
     }
   } else {

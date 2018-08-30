@@ -1,5 +1,5 @@
-import { Nullable } from 'javascriptutilities';
-import { DeleteKey } from './param';
+import {Nullable} from 'javascriptutilities';
+import {DeleteKey} from './param';
 
 export function shallowCloneObject(object: {}): {} {
   return Object.assign({}, object);

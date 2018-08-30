@@ -1,7 +1,7 @@
-import { Collections, JSObject, Nullable, Numbers } from 'javascriptutilities';
-import { Impl } from 'object';
-import { anyNumber, anything, instance, mock, spy, verify } from 'ts-mockito';
-import { EKVObject } from './../src';
+import {Collections, JSObject, Nullable, Numbers} from 'javascriptutilities';
+import {Impl} from 'object';
+import {anyNumber, anything, instance, mock, spy, verify} from 'ts-mockito';
+import {EKVObject} from './../src';
 
 describe('Array operations should be implemented correctly', () => {
   it('Updating array with empty or invalid keys - should work correctly', () => {
@@ -16,7 +16,7 @@ describe('Array operations should be implemented correctly', () => {
 
     /// When
     original._updatingArray({}, 'a', arrayFn);
-    original._updatingArray({ a: { 'invalid': 1 } }, 'a', arrayFn);
+    original._updatingArray({a: {invalid: 1}}, 'a', arrayFn);
 
     /// Then
     verify(arrayFnContainer.arrayFn(anything(), -1)).once();
@@ -30,9 +30,11 @@ describe('Array operations should be implemented correctly', () => {
 
     let array: Nullable<number>[] = [
       ...Numbers.range(0, 100),
-      undefined, null,
+      undefined,
+      null,
       ...Numbers.range(0, 100),
-      null, undefined,
+      null,
+      undefined,
       ...Numbers.range(0, 100),
     ];
 
@@ -63,7 +65,7 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Removing index with incomplete array object - should still remove correct index', () => {
     /// Setup
-    let state = EKVObject.just({ a: { 5: 0 } });
+    let state = EKVObject.just({a: {5: 0}});
     let buildPath = (index: number) => `a.${index}`;
 
     /// When
@@ -79,20 +81,22 @@ describe('Array operations should be implemented correctly', () => {
   it('Removing last array index - should work correctly', () => {
     /// Setup
     let itemCount = 10;
-    let state = EKVObject.just({ a: Numbers.range(0, itemCount) });
+    let state = EKVObject.just({a: Numbers.range(0, itemCount)});
 
     /// When
     state = state.removingArrayIndex('a', itemCount - 1);
 
     /// Then
-    expect(Object.keys(state.valueAtNode('a').value as {})).toHaveLength(itemCount - 1);
+    expect(Object.keys(state.valueAtNode('a').value as {})).toHaveLength(
+      itemCount - 1
+    );
   });
 
   it('Upserting in array - should work correctly', () => {
     /// Setup
     let path = 'a';
     let array = [1, 2, undefined, 6, 7];
-    let state = EKVObject.just({ [path]: array });
+    let state = EKVObject.just({[path]: array});
 
     /// When
     let state1 = state.upsertingInArray(path, 7, (v1, v2) => v1 === v2);
@@ -100,36 +104,50 @@ describe('Array operations should be implemented correctly', () => {
 
     /// Then
     let buildPath = (i: number) => `${path}.${i}`;
-    expect(Object.keys(state1.valueAtNode(path).value as {})).toHaveLength(array.length);
-    expect(Object.keys(state2.valueAtNode(path).value as {})).toHaveLength(array.length + 1);
-    array.forEach((v, i) => expect(state1.valueAtNode(buildPath(i)).value).toEqual(v));
+    expect(Object.keys(state1.valueAtNode(path).value as {})).toHaveLength(
+      array.length
+    );
+    expect(Object.keys(state2.valueAtNode(path).value as {})).toHaveLength(
+      array.length + 1
+    );
+    array.forEach((v, i) =>
+      expect(state1.valueAtNode(buildPath(i)).value).toEqual(v)
+    );
 
     array.concat([8]).forEach((v, i) => {
       expect(state2.valueAtNode(buildPath(i)).value).toEqual(v);
     });
 
-    expect(state2.valueAtNode(buildPath(array.length + 1)).isFailure()).toBeTruthy();
+    expect(
+      state2.valueAtNode(buildPath(array.length + 1)).isFailure()
+    ).toBeTruthy();
   });
 
   it('Upserting in array with invalid comparison - should not update', () => {
     /// Setup
     let path = 'a';
     let array = [1, 2, 5, 6, 7];
-    let state = EKVObject.just({ [path]: array });
+    let state = EKVObject.just({[path]: array});
 
     /// When
-    state = state.upsertingInArray(path, undefined, () => { throw ''; });
+    state = state.upsertingInArray(path, undefined, () => {
+      throw '';
+    });
 
     /// Then
     let buildPath = (i: number) => `${path}.${i}`;
-    expect(Object.keys(state.valueAtNode(path).value as {})).toHaveLength(array.length);
-    array.forEach((v, i) => expect(state.valueAtNode(buildPath(i)).value).toEqual(v));
+    expect(Object.keys(state.valueAtNode(path).value as {})).toHaveLength(
+      array.length
+    );
+    array.forEach((v, i) =>
+      expect(state.valueAtNode(buildPath(i)).value).toEqual(v)
+    );
   });
 
   it('Upserting in array with invalid array - should create array', () => {
     let path = 'a';
     let invalidArray = 1;
-    let state = EKVObject.just({ [path]: invalidArray });
+    let state = EKVObject.just({[path]: invalidArray});
 
     /// When
     state = state.upsertingInArray(path, 10);
@@ -142,7 +160,7 @@ describe('Array operations should be implemented correctly', () => {
   it('Upserting in array with one existing value - should iterate correctly', () => {
     /// Setup
     let path = 'a';
-    let state = EKVObject.just({ [path]: [1] });
+    let state = EKVObject.just({[path]: [1]});
 
     /// When
     state = state.upsertingInArray(path, 1);
