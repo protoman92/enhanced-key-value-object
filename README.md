@@ -4,6 +4,7 @@
 [![npm version](https://badge.fury.io/js/enhanced-key-value-object.svg?dummy=false)](https://badge.fury.io/js/enhanced-key-value-object?dummy=false)
 [![Build Status](https://travis-ci.org/protoman92/enhanced-key-value-object.svg?branch=master&dummy=false)](https://travis-ci.org/protoman92/enhanced-key-value-object?dummy=false)
 [![Coverage Status](https://coveralls.io/repos/github/protoman92/enhanced-key-value-object/badge.svg?branch=master&dummy=false)](https://coveralls.io/github/protoman92/enhanced-key-value-object?branch=master&dummy=false)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Enhanced key-value object with safe property access and immutable modications.
 
