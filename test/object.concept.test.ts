@@ -37,6 +37,7 @@ describe('Enhanced key-value object should be implemented correctly', () => {
     expect(ekvObject.numberAtNode('a.a1_1.a2_3').value).toBe(3);
     expect(ekvObject.booleanAtNode('a.a1_1.a2_3').value).toBeUndefined();
     expect(ekvObject.stringAtNode('a.a1_1.a2_3').value).toBeUndefined();
+    expect(ekvObject.objectAtNode('c').value).toBeUndefined();
     expect(ekvObject.booleanAtNode('c').value).toBe(true);
     expect(ekvObject.numberAtNode('c').value).toBeUndefined();
     expect(ekvObject.stringAtNode('d').value).toBe('d');
