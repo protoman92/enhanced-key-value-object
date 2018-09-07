@@ -1,14 +1,14 @@
 import {
   Collections,
   JSObject,
-  Nullable,
+  Never,
   Try,
   TryResult,
 } from 'javascriptutilities';
 import {Impl} from './object';
 import {join} from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
-export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
+export type EKVRawMapFn = (value: Never<unknown>) => Never<unknown>;
 type CompareFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {

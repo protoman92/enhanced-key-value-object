@@ -1,4 +1,4 @@
-import {Collections, JSObject, Nullable, Numbers} from 'javascriptutilities';
+import {Collections, JSObject, Never, Numbers} from 'javascriptutilities';
 import {Impl} from 'object';
 import {anyNumber, anything, instance, mock, spy, verify} from 'ts-mockito';
 import {EKVObject} from './../src';
@@ -28,7 +28,7 @@ describe('Array operations should be implemented correctly', () => {
     let path = 'a';
     let buildPaths = (i: number) => `${path}.${i}`;
 
-    let array: Nullable<number>[] = [
+    let array: Never<number>[] = [
       ...Numbers.range(0, 100),
       undefined,
       null,

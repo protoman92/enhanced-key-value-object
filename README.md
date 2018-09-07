@@ -32,7 +32,7 @@ object.valueAtNode('a.b.c.d.e');
 In order to update the value at some node, call:
 
 ```typescript
-object.updatingValue(string, Nullable<any>);
+object.updatingValue(string, Never<any>);
 ```
 
 The object will update the value at that node, and if necessary create new objects along the way.

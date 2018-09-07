@@ -1,11 +1,11 @@
-import {Nullable} from 'javascriptutilities';
+import {Never} from 'javascriptutilities';
 import {DeleteKey} from './param';
 
 export function shallowCloneObject(object: {}): {} {
   return Object.assign({}, object);
 }
 
-export function shallowClone<T>(object: Nullable<T>): Nullable<T> {
+export function shallowClone<T>(object: Never<T>): Never<T> {
   if (object instanceof DeleteKey) {
     return object;
   } else if (object === undefined || object === null) {

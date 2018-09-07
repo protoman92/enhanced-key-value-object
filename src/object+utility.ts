@@ -1,4 +1,4 @@
-import {Nullable} from 'javascriptutilities';
+import {Never} from 'javascriptutilities';
 import {
   Builder,
   EKVObjectType,
@@ -26,13 +26,13 @@ export function empty(): Type {
 
 /**
  * Create an enhanced key-value object with an object.
- * @param {Nullable<EKVObjectType>} object An EKVObjectType instance.
+ * @param {Never<EKVObjectType>} object An EKVObjectType instance.
  * @param {('safe' | 'unsafe')} mode If safe mode, all objects are deep cloned
  * before they are set, and otherwise for unsafe mode.
  * @returns {Type} A Type instance.
  */
 export function just(
-  object: Nullable<EKVObjectType>,
+  object: Never<EKVObjectType>,
   mode: 'safe' | 'unsafe' = 'safe'
 ): Type {
   if (object !== undefined && object !== null) {

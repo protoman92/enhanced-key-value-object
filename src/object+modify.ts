@@ -1,10 +1,10 @@
-import {JSObject, Nullable, Objects, Try, TryResult} from 'javascriptutilities';
+import {JSObject, Never, Objects, Try, TryResult} from 'javascriptutilities';
 import {Impl, Type} from './object';
 import {empty} from './object+utility';
 import {DeleteKey, DELETE_KEY} from './param';
 import {shallowClone, shallowCloneObject} from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
-export type EKVRawMapFn = (value: Nullable<unknown>) => Nullable<unknown>;
+export type EKVRawMapFn = (value: Never<unknown>) => Never<unknown>;
 
 declare module './object' {
   export interface Type {
@@ -25,10 +25,10 @@ declare module './object' {
     /**
      * Update value at a certain path.
      * @param {string} path The path at which to update value.
-     * @param {Nullable<unknown>} value Unknown value.
+     * @param {Never<unknown>} value Unknown value.
      * @returns {Type} A Type instance.
      */
-    updatingValue(path: string, value: Nullable<unknown>): Type;
+    updatingValue(path: string, value: Never<unknown>): Type;
 
     /**
      * Remove value at a certain path.
@@ -39,10 +39,10 @@ declare module './object' {
 
     /**
      * Update values from some object.
-     * @param {Nullable<JSObject<unknown>>} object A JSObject instance.
+     * @param {Never<JSObject<unknown>>} object A JSObject instance.
      * @returns {Type} A Type instance.
      */
-    updatingValues(object: Nullable<JSObject<unknown>>): Type;
+    updatingValues(object: Never<JSObject<unknown>>): Type;
 
     /**
      * Assuming that each key in the external object consists of subkeys joined
@@ -109,13 +109,13 @@ declare module './object' {
      * method should not be used anywhere else except internally.
      * @param {JSObject<unknown>} object The object to modify.
      * @param {string} path The path at which to update value.
-     * @param {Nullable<unknown>} value Unknown value.
+     * @param {Never<unknown>} value Unknown value.
      * @returns {Impl} An Impl instance.
      */
     _updatingValue(
       object: JSObject<unknown>,
       path: string,
-      value: Nullable<unknown>
+      value: Never<unknown>
     ): Impl;
 
     /**
