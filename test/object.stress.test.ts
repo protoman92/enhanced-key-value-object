@@ -89,7 +89,7 @@ function createEKVObject(combinations: JSObject<number>): EKVObject.Type {
   return ekvObject;
 }
 
-describe('EKVObject should work correctly under stress', () => {
+describe('Object should work correctly under stress', () => {
   let countPerLevel = 3;
   let maxLevel = 8;
 
