@@ -8,6 +8,16 @@ import {
   Type,
 } from './object';
 
+let defaultAccessMode: 'safe' | 'unsafe' = 'safe';
+
+export function setDefaultAccessMode(mode: 'safe' | 'unsafe') {
+  defaultAccessMode = mode;
+}
+
+export function getAccessModeOrFallback(mode?: 'safe' | 'unsafe') {
+  return mode || defaultAccessMode;
+}
+
 /**
  * Create a new builder object.
  * @returns {Builder} A Builder instance.
@@ -27,13 +37,13 @@ export function empty(): Type {
 /**
  * Create an enhanced key-value object with an object.
  * @param {Never<EKVObjectType>} object An EKVObjectType instance.
- * @param {('safe' | 'unsafe')} mode If safe mode, all objects are deep cloned
+ * @param {('safe' | 'unsafe')} [mode] If safe mode, all objects are deep cloned
  * before they are set, and otherwise for unsafe mode.
  * @returns {Type} A Type instance.
  */
 export function just(
   object: Never<EKVObjectType>,
-  mode: 'safe' | 'unsafe' = 'safe'
+  mode?: 'safe' | 'unsafe'
 ): Type {
   if (object !== undefined && object !== null) {
     if (object instanceof Impl) {
@@ -48,12 +58,12 @@ export function just(
         typeof pathSeparator === 'string'
       ) {
         return builder()
-          .withObject(innerObject, mode)
+          .withObject(innerObject, getAccessModeOrFallback(mode))
           .withPathSeparator(pathSeparator)
           .build();
       } else {
         return builder()
-          .withObject(object, mode)
+          .withObject(object, getAccessModeOrFallback(mode))
           .build();
       }
     }

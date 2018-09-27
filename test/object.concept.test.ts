@@ -1,6 +1,7 @@
 import * as mockito from 'ts-mockito';
 import {EKVObject} from './../src';
 import {Impl, objectKey, pathSeparatorKey} from './../src/object';
+import {getAccessModeOrFallback} from 'object+utility';
 let deepEqual = require('deep-equal');
 
 describe('Enhanced key-value object should be implemented correctly', () => {
@@ -187,6 +188,15 @@ describe('Enhanced key-value object should be implemented correctly', () => {
 });
 
 describe('Utilities should be implemented correctly', () => {
+  it('Getting access mode or default to fall back should work', () => {
+    /// Setup
+    EKVObject.setDefaultAccessMode('safe');
+
+    /// When && Then
+    expect(getAccessModeOrFallback('unsafe')).toEqual('unsafe');
+    expect(getAccessModeOrFallback()).toEqual('safe');
+  });
+
   it('Constructing object with just should work correctly', () => {
     /// Setup
     let innerObject = {a: 1, b: 2, c: 3};
