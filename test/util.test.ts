@@ -39,4 +39,12 @@ describe('Utilities should be implemented correctly', () => {
     let clonedBoolean = Util.shallowClone(booleanValue);
     expect(clonedBoolean).toBe(booleanValue);
   });
+
+  it('Shallow cloning complex objects - should prevent cloning', () => {
+    /// Setup && When &&  Then
+    expect(Util.shallowClone(new File([], ''))).toBeInstanceOf(File);
+    expect(Util.shallowClone(new FileReader())).toBeInstanceOf(FileReader);
+    expect(Util.shallowClone(new Error())).toBeInstanceOf(Error);
+    expect(Util.shallowClone({a: 1})).toHaveProperty('a', 1);
+  });
 });

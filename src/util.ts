@@ -19,7 +19,14 @@ export function shallowClone<T>(object: Never<T>): Never<T> {
   } else if (object instanceof Array) {
     return [...object] as any;
   } else {
-    return shallowCloneObject(object) as T;
+    let prototype = Object.getPrototypeOf(object);
+
+    // Complex objects should be left alone.
+    if (prototype && Object.getPrototypeOf(prototype)) {
+      return object;
+    } else {
+      return shallowCloneObject(object) as T;
+    }
   }
 }
 
