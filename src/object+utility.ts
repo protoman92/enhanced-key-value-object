@@ -1,11 +1,11 @@
-import {Never} from 'javascriptutilities';
+import { Never } from 'javascriptutilities';
 import {
   Builder,
   EKVObjectType,
   Impl,
   objectKey,
   pathSeparatorKey,
-  Type,
+  Type
 } from './object';
 
 let defaultAccessMode: 'safe' | 'unsafe' = 'safe';
@@ -46,28 +46,26 @@ export function just(
   mode?: 'safe' | 'unsafe'
 ): Type {
   if (object !== undefined && object !== null) {
-    if (object instanceof Impl) {
-      return object;
-    } else {
-      let innerObject = (object as any)[objectKey];
-      let pathSeparator = (object as any)[pathSeparatorKey];
+    if (object instanceof Impl) return object;
 
-      if (
-        innerObject !== undefined &&
-        innerObject !== null &&
-        typeof pathSeparator === 'string'
-      ) {
-        return builder()
-          .withObject(innerObject, getAccessModeOrFallback(mode))
-          .withPathSeparator(pathSeparator)
-          .build();
-      } else {
-        return builder()
-          .withObject(object, getAccessModeOrFallback(mode))
-          .build();
-      }
+    const innerObject = (object as any)[objectKey];
+    const pathSeparator = (object as any)[pathSeparatorKey];
+
+    if (
+      innerObject !== undefined &&
+      innerObject !== null &&
+      typeof pathSeparator === 'string'
+    ) {
+      return builder()
+        .withObject(innerObject, getAccessModeOrFallback(mode))
+        .withPathSeparator(pathSeparator)
+        .build();
     }
-  } else {
-    return empty();
+
+    return builder()
+      .withObject(object, getAccessModeOrFallback(mode))
+      .build();
   }
+
+  return empty();
 }

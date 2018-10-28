@@ -1,5 +1,5 @@
-import {Try, JSObject} from 'javascriptutilities';
-import {Impl} from './object';
+import { Try, JSObject } from 'javascriptutilities';
+import { Impl } from './object';
 type CompareFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
@@ -40,7 +40,7 @@ declare module './object' {
 }
 
 Impl.prototype._compareValues = function(object, lhs, rhs, fn) {
-  let compareFn = fn || ((v1, v2) => v1 === v2);
+  const compareFn = fn || ((v1, v2) => v1 === v2);
 
   return this._valueAtNode(object, lhs).zipWith(
     this._valueAtNode(object, rhs),

@@ -1,8 +1,8 @@
-import {JSObject, Never, Objects, Try, TryResult} from 'javascriptutilities';
-import {Impl, Type} from './object';
-import {empty} from './object+utility';
-import {DeleteKey, DELETE_KEY} from './param';
-import {shallowClone, shallowCloneObject} from './util';
+import { JSObject, Never, Objects, Try, TryResult } from 'javascriptutilities';
+import { Impl, Type } from './object';
+import { empty } from './object+utility';
+import { DeleteKey, DELETE_KEY } from './param';
+import { shallowClone, shallowCloneObject } from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
 export type EKVRawMapFn = (value: Never<unknown>) => Never<unknown>;
 
@@ -153,16 +153,16 @@ Impl.prototype._cloneWithNewObject = function(object) {
 
 Impl.prototype._mappingValue = function(object, path, mapFn) {
   try {
-    let subpaths = path.split(this.pathSeparator);
-    let objectCopy = object;
+    const subpaths = path.split(this.pathSeparator);
+    const objectCopy = object;
     let currentResult: any = objectCopy;
 
-    for (let i = 0, length = subpaths.length; i < length; i++) {
-      let subpath = subpaths[i];
+    for (let i = 0, length = subpaths.length; i < length; i += 1) {
+      const subpath = subpaths[i];
       let interValue = currentResult[subpath];
 
       if (i === length - 1) {
-        let newValue = mapFn(interValue);
+        const newValue = mapFn(interValue);
 
         if (newValue instanceof DeleteKey) {
           delete currentResult[subpath];
@@ -208,7 +208,7 @@ Impl.prototype._removingValue = function(object, path) {
 };
 
 Impl.prototype._copyingValue = function(object, src, dest) {
-  let sourceValue = this._valueAtNode(object, src);
+  const sourceValue = this._valueAtNode(object, src);
   return this._updatingValue(object, dest, sourceValue.value);
 };
 
@@ -236,9 +236,9 @@ Impl.prototype.removingValue = function(path) {
 
 Impl.prototype.updatingValues = function(object) {
   try {
-    let currentObject = this;
-    let clonedTarget = JSON.parse(JSON.stringify(object));
-    let newObject = Object.assign(currentObject, clonedTarget);
+    const currentObject = this;
+    const clonedTarget = JSON.parse(JSON.stringify(object));
+    const newObject = Object.assign(currentObject, clonedTarget);
 
     return new Impl()
       .copyingPropertiesUnsafely(this)
@@ -249,14 +249,14 @@ Impl.prototype.updatingValues = function(object) {
 };
 
 Impl.prototype.updatingValuesWithFullPaths = function(object, separator?) {
-  let pathSeparator = this.pathSeparator;
-  let sep = separator || pathSeparator;
-  let shouldReconstruct = sep !== pathSeparator;
+  const pathSeparator = this.pathSeparator;
+  const sep = separator || pathSeparator;
+  const shouldReconstruct = sep !== pathSeparator;
   let result = this;
-  let resultObject = this.shallowClonedObject;
+  const resultObject = this.shallowClonedObject;
 
   Objects.entries(object).forEach(([key, value]) => {
-    let actualKey = shouldReconstruct
+    const actualKey = shouldReconstruct
       ? key.split(sep).join(pathSeparator)
       : key;
     result = result._updatingValue(resultObject, actualKey, value);
@@ -274,9 +274,9 @@ Impl.prototype.movingValue = function(src, dest) {
 };
 
 Impl.prototype.swappingValue = function(path1, path2) {
-  let clonedObject = this.shallowClonedObject;
-  let value1 = this._valueAtNode(clonedObject, path1).value;
-  let value2 = this._valueAtNode(clonedObject, path2).value;
+  const clonedObject = this.shallowClonedObject;
+  const value1 = this._valueAtNode(clonedObject, path1).value;
+  const value2 = this._valueAtNode(clonedObject, path2).value;
   let result = this._updatingValue(clonedObject, path2, value1);
   result = this._updatingValue(clonedObject, path1, value2);
   return result;

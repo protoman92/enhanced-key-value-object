@@ -1,14 +1,14 @@
 import * as mockito from 'ts-mockito';
-import {EKVObject} from '../src';
-import {Impl} from './../src/object';
-let deepEqual = require('deep-equal');
+import { EKVObject } from '../src';
+import { Impl } from './../src/object';
+const deepEqual = require('deep-equal');
 
 describe('Basic operations should work correctly', () => {
-  let object = {
-    a: {a1_1: {a2_1: 1, a2_2: 2, a2_3: 3, a2_4: []}, a1_2: 1},
-    b: {b1_1: {b2_1: 4, b2_2: 5, b2_3: 6}, b1_2: 2},
+  const object = {
+    a: { a1_1: { a2_1: 1, a2_2: 2, a2_3: 3, a2_4: [] }, a1_2: 1 },
+    b: { b1_1: { b2_1: 4, b2_2: 5, b2_3: 6 }, b1_2: 2 },
     c: true,
-    d: 'd',
+    d: 'd'
   };
 
   let ekvObject: Impl;
@@ -26,7 +26,7 @@ describe('Basic operations should work correctly', () => {
 
   it('Accessing empty path should work correctly', () => {
     /// Setup && When
-    let accessedObject = ekvObject.valueAtNode('');
+    const accessedObject = ekvObject.valueAtNode('');
 
     /// Then
     expect(accessedObject.isFailure()).toBeTruthy();
@@ -46,12 +46,12 @@ describe('Basic operations should work correctly', () => {
 
   it('Accessing path with thrown error should work correctly', () => {
     /// Setup
-    let spiedObject = mockito.spy(ekvObject);
-    let actualObject = mockito.instance(spiedObject);
+    const spiedObject = mockito.spy(ekvObject);
+    const actualObject = mockito.instance(spiedObject);
     mockito.when(spiedObject.actualObject).thenReturn(undefined as any);
 
     /// When
-    let accessedObject = actualObject.valueAtNode('d');
+    const accessedObject = actualObject.valueAtNode('d');
 
     /// Then
     expect(accessedObject.isFailure()).toBeTruthy();
@@ -59,7 +59,7 @@ describe('Basic operations should work correctly', () => {
 
   it('Emptying object should work correctly', () => {
     /// Setup && When
-    let emptied = ekvObject.emptying();
+    const emptied = ekvObject.emptying();
 
     /// When
     expect(emptied.deepClonedObject).toEqual({});
@@ -68,13 +68,13 @@ describe('Basic operations should work correctly', () => {
 
   it('Updating value path should work correctly', () => {
     /// Setup
-    let path1 = 'a.b.c.d.e';
-    let path2 = 'a.a1_1.a2_4.a3_1.non_exitent.';
+    const path1 = 'a.b.c.d.e';
+    const path2 = 'a.a1_1.a2_4.a3_1.non_exitent.';
 
     /// When
-    let ekvObject1 = ekvObject.updatingValue(path1, 1);
-    let ekvObject2 = ekvObject.mappingValue(path2, () => [1, 2, 3]);
-    let ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
+    const ekvObject1 = ekvObject.updatingValue(path1, 1);
+    const ekvObject2 = ekvObject.mappingValue(path2, () => [1, 2, 3]);
+    const ekvObject3 = ekvObject.removingValue('a.a1_1.a2_1');
 
     /// Then
     expect(ekvObject.deepClonedObject).toEqual(object);
@@ -85,12 +85,12 @@ describe('Basic operations should work correctly', () => {
 
   it('Updating value path with thrown error should work correctly', () => {
     /// Setup
-    let spiedObject = mockito.spy(ekvObject);
-    let actualObject = mockito.instance(spiedObject);
+    const spiedObject = mockito.spy(ekvObject);
+    const actualObject = mockito.instance(spiedObject);
     mockito.when(spiedObject.shallowClonedObject).thenReturn(undefined as any);
 
     /// When
-    let ekvObject2 = actualObject.updatingValue('a.b.c.d.e.f', undefined);
+    const ekvObject2 = actualObject.updatingValue('a.b.c.d.e.f', undefined);
 
     /// Then
     expect(ekvObject2).toBeTruthy();
@@ -98,10 +98,10 @@ describe('Basic operations should work correctly', () => {
 
   it('Updating with external object should work', () => {
     /// Setup
-    let otherObject = {e: {f: {g: 1}}};
+    const otherObject = { e: { f: { g: 1 } } };
 
     /// When
-    let updatedObject = ekvObject.updatingValues(otherObject);
+    const updatedObject = ekvObject.updatingValues(otherObject);
 
     /// Then
     expect(updatedObject.valueAtNode('e.f.g').value).toBe(1);
@@ -109,14 +109,14 @@ describe('Basic operations should work correctly', () => {
 
   it('Updating with external object and thrown error should work', () => {
     /// Setup
-    let spiedObject = mockito.spy(ekvObject);
-    let actualObject = mockito.instance(spiedObject);
-    let otherObject = undefined;
+    const spiedObject = mockito.spy(ekvObject);
+    const actualObject = mockito.instance(spiedObject);
+    const otherObject = undefined;
     mockito.when(spiedObject.deepClonedObject).thenThrow(new Error(''));
     mockito.when(spiedObject.cloneBuilder()).thenReturn(EKVObject.builder());
 
     // When
-    let updatedObject = actualObject.updatingValues(otherObject);
+    const updatedObject = actualObject.updatingValues(otherObject);
 
     /// Then
     expect(updatedObject).toBeTruthy();
@@ -124,8 +124,8 @@ describe('Basic operations should work correctly', () => {
 
   it('Checking object equality for keys should work', () => {
     /// Setup
-    let paths = ['a.a1_1.a2_1', 'a.a1_2', 'c', 'd.1.2.3', 'non_existent'];
-    let ekvObject1 = {};
+    const paths = ['a.a1_1.a2_1', 'a.a1_2', 'c', 'd.1.2.3', 'non_existent'];
+    const ekvObject1 = {};
 
     /// When && Then
     expect(ekvObject.equalsForValues(ekvObject, paths)).toBeTruthy();
@@ -140,9 +140,9 @@ describe('Basic operations should work correctly', () => {
 
   it('Checking equality with thrown error should work correctly', () => {
     /// Setup
-    let paths = ['non_existent'];
-    let spiedObject = mockito.spy(ekvObject);
-    let actualObject = mockito.instance(spiedObject);
+    const paths = ['non_existent'];
+    const spiedObject = mockito.spy(ekvObject);
+    const actualObject = mockito.instance(spiedObject);
     mockito
       .when(spiedObject.valueAtNode(mockito.anyString()))
       .thenThrow(new Error(''));
@@ -153,10 +153,10 @@ describe('Basic operations should work correctly', () => {
 
   it('Cloning for paths should work', () => {
     /// Setup
-    let paths = ['a.a1_1.a2_1', 'd'];
+    const paths = ['a.a1_1.a2_1', 'd'];
 
     /// When
-    let cloned = ekvObject.cloningForPaths(...paths);
+    const cloned = ekvObject.cloningForPaths(...paths);
 
     /// Then
     paths.forEach(v =>
@@ -170,13 +170,13 @@ describe('Basic operations should work correctly', () => {
 
   it('Copying and moving values should work correctly', () => {
     /// Setup
-    let sourcePath = 'a.a1_1.a2_1';
-    let destPath = 'non_existent.non_existent_1';
+    const sourcePath = 'a.a1_1.a2_1';
+    const destPath = 'non_existent.non_existent_1';
     ekvObject = ekvObject.updatingValue(sourcePath, 1) as Impl;
 
     /// When
-    let ekvObject1 = ekvObject.copyingValue(sourcePath, destPath);
-    let ekvObject2 = ekvObject.movingValue(sourcePath, destPath);
+    const ekvObject1 = ekvObject.copyingValue(sourcePath, destPath);
+    const ekvObject2 = ekvObject.movingValue(sourcePath, destPath);
 
     /// Then
     expect(ekvObject1.valueAtNode(sourcePath).value).toBe(1);

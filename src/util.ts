@@ -1,5 +1,5 @@
-import {Never} from 'javascriptutilities';
-import {DeleteKey} from './param';
+import { Never } from 'javascriptutilities';
+import { DeleteKey } from './param';
 
 export function shallowCloneObject(object: {}): {} {
   return Object.assign({}, object);
@@ -8,26 +8,32 @@ export function shallowCloneObject(object: {}): {} {
 export function shallowClone<T>(object: Never<T>): Never<T> {
   if (object instanceof DeleteKey) {
     return object;
-  } else if (object === undefined || object === null) {
+  }
+
+  if (object === undefined || object === null) {
     return object;
-  } else if (
+  }
+
+  if (
     typeof object === 'boolean' ||
     typeof object === 'number' ||
     typeof object === 'string'
   ) {
     return object;
-  } else if (object instanceof Array) {
-    return [...object] as any;
-  } else {
-    let prototype = Object.getPrototypeOf(object);
-
-    // Complex objects should be left alone.
-    if (prototype && Object.getPrototypeOf(prototype)) {
-      return object;
-    } else {
-      return shallowCloneObject(object) as T;
-    }
   }
+
+  if (object instanceof Array) {
+    return [...object] as any;
+  }
+
+  const prototype = Object.getPrototypeOf(object);
+
+  // Complex objects should be left alone.
+  if (prototype && Object.getPrototypeOf(prototype)) {
+    return object;
+  }
+
+  return shallowCloneObject(object) as T;
 }
 
 export function join(sep: string, ...paths: any[]) {

@@ -3,13 +3,13 @@ import {
   JSObject,
   Numbers,
   Objects,
-  Strings,
+  Strings
 } from 'javascriptutilities';
-import {EKVObject} from './../src';
+import { EKVObject } from './../src';
 
-let alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-let separator = '&';
-let keyIdentifier = 'stress';
+const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const separator = '&';
+const keyIdentifier = 'stress';
 
 function createAlphabeticalLevels(levelCount: number): string[] {
   return alphabets
@@ -19,31 +19,31 @@ function createAlphabeticalLevels(levelCount: number): string[] {
 }
 
 function createAllKeys(levels: string[], countPerLevel: number): string[] {
-  let subLength = levels.length;
-  let last = levels[subLength - 1];
+  const subLength = levels.length;
+  const last = levels[subLength - 1];
 
   if (subLength === 1) {
-    return Numbers.range(0, countPerLevel).map(v => '' + last + v);
-  } else {
-    let subKeys = createAllKeys(levels.slice(0, subLength - 1), countPerLevel);
-    let lastKeys = createAllKeys([last], countPerLevel);
-
-    return subKeys
-      .map(v => lastKeys.map(v1 => v + separator + v1))
-      .reduce((a, b) => a.concat(b), []);
+    return Numbers.range(0, countPerLevel).map(v => `${last}${v}`);
   }
+
+  const subKeys = createAllKeys(levels.slice(0, subLength - 1), countPerLevel);
+  const lastKeys = createAllKeys([last], countPerLevel);
+
+  return subKeys
+    .map(v => lastKeys.map(v1 => v + separator + v1))
+    .reduce((a, b) => a.concat(b), []);
 }
 
 function createCombinations(
   levels: string[],
   countPerLevel: number
 ): JSObject<any> {
-  let allCombinations: JSObject<number> = {};
-  let allKeys = createAllKeys(levels, countPerLevel);
-  let possibleValueTypes = ['array', 'number', 'object', 'string'];
+  const allCombinations: JSObject<number> = {};
+  const allKeys = createAllKeys(levels, countPerLevel);
+  const possibleValueTypes = ['array', 'number', 'object', 'string'];
 
   function randomizeData(): any {
-    let randomType = Collections.randomElement(possibleValueTypes).value;
+    const randomType = Collections.randomElement(possibleValueTypes).value;
 
     switch (randomType) {
       case 'array':
@@ -54,7 +54,7 @@ function createCombinations(
 
       case 'object':
         return Numbers.range(0, 5)
-          .map(v => ({[v]: Strings.randomString(10)}))
+          .map(v => ({ [v]: Strings.randomString(10) }))
           .reduce((acc, v) => Object.assign(acc, v), {});
 
       case 'string':
@@ -63,11 +63,11 @@ function createCombinations(
     }
   }
 
-  for (let key of allKeys) {
-    let keyParts = key.split(separator);
-    let keyLength = keyParts.length;
+  for (const key of allKeys) {
+    const keyParts = key.split(separator);
+    const keyLength = keyParts.length;
 
-    let subKeys = Numbers.range(0, keyLength)
+    const subKeys = Numbers.range(0, keyLength)
       .map(v => keyParts.slice(0, v + 1))
       .map(v => v.join(separator));
 
@@ -90,28 +90,28 @@ function createEKVObject(combinations: JSObject<number>): EKVObject.Type {
 }
 
 describe('Object should work correctly under stress', () => {
-  let countPerLevel = 3;
-  let maxLevel = 8;
+  const countPerLevel = 3;
+  const maxLevel = 8;
 
   it('Copying/moving values from source to destination should work', () => {
-    for (let i of Numbers.range(1, maxLevel)) {
+    for (const i of Numbers.range(1, maxLevel)) {
       /// Setup
-      let levels = createAlphabeticalLevels(i);
-      let allKeys = createAllKeys(levels, countPerLevel);
-      let allCombinations = createCombinations(levels, countPerLevel);
-      let ekvObject = createEKVObject(allCombinations);
+      const levels = createAlphabeticalLevels(i);
+      const allKeys = createAllKeys(levels, countPerLevel);
+      const allCombinations = createCombinations(levels, countPerLevel);
+      const ekvObject = createEKVObject(allCombinations);
 
       /// When
-      for (let srcPath of allKeys) {
+      for (const srcPath of allKeys) {
         let destPath = '';
 
         while (destPath === srcPath) {
           destPath = Collections.randomElement(allKeys).value!;
         }
 
-        let srcValue = ekvObject.valueAtNode(srcPath).value!;
-        let copiedObject = ekvObject.copyingValue(srcPath, destPath);
-        let movedObject = ekvObject.movingValue(srcPath, destPath);
+        const srcValue = ekvObject.valueAtNode(srcPath).value!;
+        const copiedObject = ekvObject.copyingValue(srcPath, destPath);
+        const movedObject = ekvObject.movingValue(srcPath, destPath);
 
         /// Then
         expect(copiedObject.valueAtNode(srcPath).isSuccess()).toBeTruthy();
@@ -125,32 +125,32 @@ describe('Object should work correctly under stress', () => {
   });
 
   it('Values with full paths should work correctly', () => {
-    for (let i of Numbers.range(1, maxLevel)) {
+    for (const i of Numbers.range(1, maxLevel)) {
       /// Setup
-      let levels = createAlphabeticalLevels(i);
-      let allCombinations = createCombinations(levels, countPerLevel);
-      let ekvObject = createEKVObject(allCombinations);
+      const levels = createAlphabeticalLevels(i);
+      const allCombinations = createCombinations(levels, countPerLevel);
+      const ekvObject = createEKVObject(allCombinations);
 
       /// When
-      let fullPathValues = ekvObject.valuesWithFullPaths();
+      const fullPathValues = ekvObject.valuesWithFullPaths();
 
-      let validReconstructed1 = EKVObject.empty().updatingValuesWithFullPaths(
+      const validReconstructed1 = EKVObject.empty().updatingValuesWithFullPaths(
         fullPathValues
       );
 
-      let validReconstructed2 = EKVObject.empty().updatingValuesWithFullPaths(
+      const validReconstructed2 = EKVObject.empty().updatingValuesWithFullPaths(
         fullPathValues,
         'othersep'
       );
 
       /// Then
       Objects.entries(fullPathValues).forEach(([key]) => {
-        let actualKey = key
+        const actualKey = key
           .split(separator)
           .filter(v => v.includes(keyIdentifier))
           .join(separator);
 
-        let actualValue = allCombinations[actualKey];
+        const actualValue = allCombinations[actualKey];
         expect(actualValue).toBeDefined();
         expect(actualValue).not.toBeNull();
       });

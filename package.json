@@ -8,6 +8,7 @@
   "scripts": {
     "setup": "npm install",
     "build": "tsc",
+    "lint": "./node_modules/tslint/bin/tslint '{src,test}/**/*'",
     "test": "jest --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "rm -rf ./dist && tsc"
@@ -32,7 +33,12 @@
     "coveralls": "^3.0.0",
     "deep-equal": "^1.0.1",
     "jest": "^21.2.1",
+    "prettier": "^1.14.3",
+    "prettier-tslint": "^0.4.0",
     "ts-jest": "^21.2.3",
-    "ts-mockito": "^2.3.0"
+    "ts-mockito": "^2.3.0",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0"
   }
 }

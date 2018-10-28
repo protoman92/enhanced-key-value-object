@@ -1,4 +1,4 @@
-import {Impl} from './object';
+import { Impl } from './object';
 
 declare module './object' {
   export interface Type {
@@ -15,7 +15,7 @@ declare module './object' {
 
 Impl.prototype.cloningForPaths = function(...paths) {
   let result = new Impl();
-  let resultObject = {};
+  const resultObject = {};
 
   paths.forEach(v =>
     this.valueAtNode(v).doOnNext(

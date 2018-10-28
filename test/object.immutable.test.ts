@@ -1,5 +1,5 @@
-import {JSObject} from 'javascriptutilities';
-import {EKVObject} from './../src';
+import { JSObject } from 'javascriptutilities';
+import { EKVObject } from './../src';
 
 describe('EK Object should be immutable', () => {
   let object: JSObject<any>;
@@ -20,13 +20,13 @@ describe('EK Object should be immutable', () => {
 
   it('Copying and moving values should not modify original object', () => {
     /// Setup
-    let sourcePath = 'a.b.c';
-    let destPath = 'e.f.g.h';
-    ekvObject = ekvObject.updatingValue('a.b.c', {d: 1});
+    const sourcePath = 'a.b.c';
+    const destPath = 'e.f.g.h';
+    ekvObject = ekvObject.updatingValue('a.b.c', { d: 1 });
 
     /// When
-    let copied = ekvObject.copyingValue(sourcePath, destPath);
-    let moved = ekvObject.movingValue(sourcePath, destPath);
+    const copied = ekvObject.copyingValue(sourcePath, destPath);
+    const moved = ekvObject.movingValue(sourcePath, destPath);
 
     /// Then
     expect(copied.valueAtNode(sourcePath).isSuccess()).toBeTruthy();
@@ -37,8 +37,8 @@ describe('EK Object should be immutable', () => {
 
   it('Updating value with reference object should remove reference to said object', () => {
     /// Setup
-    let path = 'a.b.c';
-    let valueObject: JSObject<any> = {};
+    const path = 'a.b.c';
+    const valueObject: JSObject<any> = {};
 
     /// When
     ekvObject = ekvObject.updatingValue(path, valueObject);

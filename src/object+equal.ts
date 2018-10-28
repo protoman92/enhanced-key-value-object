@@ -1,5 +1,5 @@
-import {Impl} from './object';
-import {just} from './object+utility';
+import { Impl } from './object';
+import { just } from './object+utility';
 type EqualFn = (v1: unknown, v2: unknown) => boolean;
 
 declare module './object' {
@@ -22,17 +22,17 @@ declare module './object' {
 }
 
 Impl.prototype.equalsForValues = function(object, paths, equalFn?) {
-  let compareFn =
+  const compareFn =
     equalFn !== undefined && equalFn !== null
       ? equalFn
       : (v1: unknown, v2: unknown) => v1 === v2;
 
-  let rhsObject = just(object);
+  const rhsObject = just(object);
 
-  for (let path of paths) {
+  for (const path of paths) {
     try {
-      let lhsValue = this.valueAtNode(path);
-      let rhsValue = rhsObject.valueAtNode(path);
+      const lhsValue = this.valueAtNode(path);
+      const rhsValue = rhsObject.valueAtNode(path);
 
       if (lhsValue.isFailure() && rhsValue.isFailure()) {
         continue;

@@ -3,11 +3,11 @@ import {EKVObject} from 'index';
 describe('Complex operations should be implemented correctly', () => {
   it('Accessing values with full paths should work correctly', () => {
     /// Setup
-    let object = {a: [{a: 1}, {b: 2}], b: {c: 1, d: 2}, c: 1, d: 2};
-    let ekvObject = EKVObject.just(object);
+    const object = {a: [{a: 1}, {b: 2}], b: {c: 1, d: 2}, c: 1, d: 2};
+    const ekvObject = EKVObject.just(object);
 
     /// When
-    let valuesWithFullPaths = ekvObject.valuesWithFullPaths();
+    const valuesWithFullPaths = ekvObject.valuesWithFullPaths();
 
     /// Then
     expect(valuesWithFullPaths).toEqual({

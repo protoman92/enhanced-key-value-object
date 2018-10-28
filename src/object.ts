@@ -1,5 +1,5 @@
-import {BuildableType, BuilderType, JSObject} from 'javascriptutilities';
-import {shallowCloneObject} from './util';
+import { BuildableType, BuilderType, JSObject } from 'javascriptutilities';
+import { shallowCloneObject } from './util';
 
 export type EKVObjectType = Type | JSObject<unknown>;
 export let objectKey: keyof Impl = '_object';
@@ -16,6 +16,7 @@ export interface Type extends BuildableType<Builder> {
 export class Impl implements Type {
   public _object: JSObject<unknown>;
   public _pathSeparator: string;
+  public _errorAccessMapper?: (error: Error) => Error;
 
   public constructor() {
     this._object = {};
@@ -101,7 +102,7 @@ export class Builder implements BuilderType<Type> {
   }
 
   public withPathSeparator(separator: string) {
-    if (separator !== undefined && separator != undefined) {
+    if (separator !== undefined && separator !== undefined) {
       this.object.settingPathSeparatorUnsafely(separator);
     }
 
@@ -112,9 +113,9 @@ export class Builder implements BuilderType<Type> {
     if (buildable !== undefined && buildable !== null) {
       this.object.settingObjectUnsafely(buildable.deepClonedObject);
       return this.withPathSeparator(buildable.pathSeparator);
-    } else {
-      return this;
     }
+
+    return this;
   }
 
   public build(): Type {

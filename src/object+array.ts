@@ -3,10 +3,10 @@ import {
   JSObject,
   Never,
   Try,
-  TryResult,
+  TryResult
 } from 'javascriptutilities';
-import {Impl} from './object';
-import {join} from './util';
+import { Impl } from './object';
+import { join } from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
 export type EKVRawMapFn = (value: Never<unknown>) => Never<unknown>;
 type CompareFn = (v1: unknown, v2: unknown) => boolean;
@@ -61,37 +61,34 @@ declare module './object' {
 }
 
 Impl.prototype._updatingArray = function(object, path, arrayFn) {
-  let arrayObject = this._valueAtNode(object, path)
+  const arrayObject = this._valueAtNode(object, path)
     .map(v => {
       return v instanceof Object ? v : {};
     })
     .getOrElse(() => ({}));
 
-  let keys = Object.keys(arrayObject);
+  const keys = Object.keys(arrayObject);
+  if (keys.length === 0) return arrayFn(object, -1);
 
-  if (keys.length === 0) {
-    return arrayFn(object, -1);
-  } else {
-    try {
-      let lastKey = Collections.last(keys).getOrThrow();
-      let lastIndex = parseInt(lastKey, undefined);
+  try {
+    const lastKey = Collections.last(keys).getOrThrow();
+    const lastIndex = parseInt(lastKey, undefined);
 
-      if (!isNaN(lastIndex)) {
-        return arrayFn(object, lastIndex);
-      }
-    } catch {}
-  }
+    if (!isNaN(lastIndex)) {
+      return arrayFn(object, lastIndex);
+    }
+  } catch {}
 
   return this.cloneBuilder().build() as Impl;
 };
 
 Impl.prototype.removingArrayIndex = function(path, index) {
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
-    let sep = this.pathSeparator;
-    let buildPath = (i: number) => join(sep, path, i);
+    const sep = this.pathSeparator;
+    const buildPath = (i: number) => join(sep, path, i);
     let newState = this;
 
-    for (let i = index; i <= lastIndex; i++) {
+    for (let i = index; i <= lastIndex; i += 1) {
       if (i === lastIndex) {
         newState = newState._removingValue(v, buildPath(i));
       } else {
@@ -104,15 +101,15 @@ Impl.prototype.removingArrayIndex = function(path, index) {
 };
 
 Impl.prototype.upsertingInArray = function(path, value, fn) {
-  let compareFn = fn || ((v1: unknown, v2: unknown) => v1 === v2);
+  const compareFn = fn || ((v1: unknown, v2: unknown) => v1 === v2);
 
   return this._updatingArray(this.shallowClonedObject, path, (v, lastIndex) => {
-    let newState = this;
-    let buildPath = (i: number) => join(this.pathSeparator, path, i);
+    const newState = this;
+    const buildPath = (i: number) => join(this.pathSeparator, path, i);
 
-    for (let i = 0; i <= lastIndex; i++) {
-      let indexPath = buildPath(i);
-      let valueAtIndex = this._valueAtNode(v, indexPath).value;
+    for (let i = 0; i <= lastIndex; i += 1) {
+      const indexPath = buildPath(i);
+      const valueAtIndex = this._valueAtNode(v, indexPath).value;
 
       if (valueAtIndex !== undefined && valueAtIndex !== null) {
         if (compareFn(valueAtIndex, value)) {
@@ -123,7 +120,7 @@ Impl.prototype.upsertingInArray = function(path, value, fn) {
       }
     }
 
-    let lastIndexPath = buildPath(lastIndex + 1);
+    const lastIndexPath = buildPath(lastIndex + 1);
     return newState._updatingValue(v, lastIndexPath, value);
   });
 };

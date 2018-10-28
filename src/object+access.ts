@@ -1,6 +1,6 @@
-import {JSObject, Objects, Try} from 'javascriptutilities';
-import {Impl} from './object';
-import {just} from './object+utility';
+import { JSObject, Objects, Try } from 'javascriptutilities';
+import { Impl } from './object';
+import { just } from './object+utility';
 
 declare module './object' {
   export interface Type {
@@ -60,12 +60,12 @@ declare module './object' {
 }
 
 Impl.prototype._valueAtNode = function(object, path) {
-  let subpaths = path.split(this.pathSeparator);
+  const subpaths = path.split(this.pathSeparator);
   let currentResult: any = object;
 
-  for (let subpath of subpaths) {
+  for (const subpath of subpaths) {
     try {
-      let intermediateResult = currentResult[subpath];
+      const intermediateResult = currentResult[subpath];
 
       if (intermediateResult !== undefined && intermediateResult !== null) {
         currentResult = intermediateResult;
@@ -109,8 +109,8 @@ Impl.prototype.objectAtNode = function(path: string) {
 };
 
 Impl.prototype.valuesWithFullPaths = function(separator?) {
-  let result: JSObject<unknown> = {};
-  let sep = separator || this.pathSeparator;
+  const result: JSObject<unknown> = {};
+  const sep = separator || this.pathSeparator;
 
   Objects.entries(this.actualObject).forEach(([key, value]) => {
     if (
@@ -120,7 +120,7 @@ Impl.prototype.valuesWithFullPaths = function(separator?) {
     ) {
       result[key] = value;
     } else if (value instanceof Object) {
-      let subObjects = just(value).valuesWithFullPaths(sep);
+      const subObjects = just(value).valuesWithFullPaths(sep);
 
       Objects.entries(subObjects).map(([subKey, subValue]) => {
         result[`${key}${sep}${subKey}`] = subValue;

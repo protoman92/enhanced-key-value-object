@@ -6,13 +6,13 @@ import {EKVObject} from './../src';
 describe('Array operations should be implemented correctly', () => {
   it('Updating array with empty or invalid keys - should work correctly', () => {
     /// Setup
-    let original = EKVObject.empty() as Impl;
+    const original = EKVObject.empty() as Impl;
 
-    let arrayFnContainer = spy({
+    const arrayFnContainer = spy({
       arrayFn: (_v: JSObject<any>, _lastIndex: number): Impl => mock(Impl),
     });
 
-    let arrayFn = instance(arrayFnContainer).arrayFn;
+    const arrayFn = instance(arrayFnContainer).arrayFn;
 
     /// When
     original._updatingArray({}, 'a', arrayFn);
@@ -25,10 +25,10 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Removing array index should work correctly', () => {
     /// Setup
-    let path = 'a';
-    let buildPaths = (i: number) => `${path}.${i}`;
+    const path = 'a';
+    const buildPaths = (i: number) => `${path}.${i}`;
 
-    let array: Never<number>[] = [
+    const array: Never<number>[] = [
       ...Numbers.range(0, 100),
       undefined,
       null,
@@ -42,15 +42,15 @@ describe('Array operations should be implemented correctly', () => {
     state = state.updatingValue(path, array);
 
     /// When
-    for (let i = 0; i < 100; i++) {
-      let indexArray = Numbers.range(0, array.length - 1);
-      let removedIndex = Collections.randomElement(indexArray).value!;
+    for (let i = 0; i < 100; i += 1) {
+      const indexArray = Numbers.range(0, array.length - 1);
+      const removedIndex = Collections.randomElement(indexArray).value!;
       array.splice(removedIndex, 1);
       state = state.removingArrayIndex(path, removedIndex);
 
       /// Then
       array.forEach((v, j) => {
-        let stateValue = state.valueAtNode(buildPaths(j));
+        const stateValue = state.valueAtNode(buildPaths(j));
 
         if (stateValue.isSuccess()) {
           expect(stateValue.value).toEqual(v);
@@ -66,7 +66,7 @@ describe('Array operations should be implemented correctly', () => {
   it('Removing index with incomplete array object - should still remove correct index', () => {
     /// Setup
     let state = EKVObject.just({a: {5: 0}});
-    let buildPath = (index: number) => `a.${index}`;
+    const buildPath = (index: number) => `a.${index}`;
 
     /// When
     state = state.removingArrayIndex('a', 3);
@@ -80,7 +80,7 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Removing last array index - should work correctly', () => {
     /// Setup
-    let itemCount = 10;
+    const itemCount = 10;
     let state = EKVObject.just({a: Numbers.range(0, itemCount)});
 
     /// When
@@ -94,16 +94,16 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Upserting in array - should work correctly', () => {
     /// Setup
-    let path = 'a';
-    let array = [1, 2, undefined, 6, 7];
-    let state = EKVObject.just({[path]: array});
+    const path = 'a';
+    const array = [1, 2, undefined, 6, 7];
+    const state = EKVObject.just({[path]: array});
 
     /// When
-    let state1 = state.upsertingInArray(path, 7, (v1, v2) => v1 === v2);
-    let state2 = state.upsertingInArray(path, 8);
+    const state1 = state.upsertingInArray(path, 7, (v1, v2) => v1 === v2);
+    const state2 = state.upsertingInArray(path, 8);
 
     /// Then
-    let buildPath = (i: number) => `${path}.${i}`;
+    const buildPath = (i: number) => `${path}.${i}`;
     expect(Object.keys(state1.valueAtNode(path).value as {})).toHaveLength(
       array.length
     );
@@ -125,8 +125,8 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Upserting in array with invalid comparison - should not update', () => {
     /// Setup
-    let path = 'a';
-    let array = [1, 2, 5, 6, 7];
+    const path = 'a';
+    const array = [1, 2, 5, 6, 7];
     let state = EKVObject.just({[path]: array});
 
     /// When
@@ -135,7 +135,7 @@ describe('Array operations should be implemented correctly', () => {
     });
 
     /// Then
-    let buildPath = (i: number) => `${path}.${i}`;
+    const buildPath = (i: number) => `${path}.${i}`;
     expect(Object.keys(state.valueAtNode(path).value as {})).toHaveLength(
       array.length
     );
@@ -145,8 +145,8 @@ describe('Array operations should be implemented correctly', () => {
   });
 
   it('Upserting in array with invalid array - should create array', () => {
-    let path = 'a';
-    let invalidArray = 1;
+    const path = 'a';
+    const invalidArray = 1;
     let state = EKVObject.just({[path]: invalidArray});
 
     /// When
@@ -159,7 +159,7 @@ describe('Array operations should be implemented correctly', () => {
 
   it('Upserting in array with one existing value - should iterate correctly', () => {
     /// Setup
-    let path = 'a';
+    const path = 'a';
     let state = EKVObject.just({[path]: [1]});
 
     /// When
