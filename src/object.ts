@@ -34,9 +34,7 @@ export class Impl implements Type {
 
   public get deepClonedObject(): JSObject<unknown> {
     return JSON.parse(
-      JSON.stringify(this._object, (_k, v) => {
-        return v === undefined ? null : v;
-      })
+      JSON.stringify(this._object, (_k, v) => (v === undefined ? null : v))
     );
   }
 
@@ -56,20 +54,22 @@ export class Impl implements Type {
     return this.builder().withBuildable(this);
   }
 
-  public settingObjectUnsafely(object: JSObject<unknown>) {
-    this._object = object;
-    return this;
+  private _copyingPropertiesUnsafely(instance: Impl) {
+    this._object = instance._object;
+    this._pathSeparator = instance._pathSeparator;
+    this._accessErrorMapper = instance._accessErrorMapper;
   }
 
-  public settingPathSeparatorUnsafely(separator: string) {
-    this._pathSeparator = separator;
-    return this;
-  }
-
-  public copyingPropertiesUnsafely(ekvObject: Impl) {
-    return this.settingObjectUnsafely(
-      ekvObject._object
-    ).settingPathSeparatorUnsafely(ekvObject._pathSeparator);
+  /**
+   * Clone with a new object, keeping all other custom properties.
+   * @param {JSObject<unknown>} object A JSObject instance.
+   * @returns {Impl} An Impl instance.
+   */
+  public _cloneWithNewObjectUnsafely(object: JSObject<unknown>): Impl {
+    const newObject = new Impl();
+    newObject._copyingPropertiesUnsafely(this);
+    newObject._object = object;
+    return newObject;
   }
 }
 
@@ -87,16 +87,14 @@ export class Builder implements BuilderType<Type> {
     if (object !== undefined && object !== null) {
       switch (mode) {
         case 'unsafe':
-          this.object.settingObjectUnsafely(object);
+          this.object._object = object;
           break;
 
         default:
-          this.object.settingObjectUnsafely(
-            JSON.parse(
-              JSON.stringify(object, (_k, v) => {
-                return v === undefined ? null : v;
-              })
-            )
+          this.object._object = JSON.parse(
+            JSON.stringify(object, (_k, v) => {
+              return v === undefined ? null : v;
+            })
           );
 
           break;
@@ -108,7 +106,7 @@ export class Builder implements BuilderType<Type> {
 
   public withPathSeparator(separator: string) {
     if (separator !== undefined && separator !== undefined) {
-      this.object.settingPathSeparatorUnsafely(separator);
+      this.object._pathSeparator = separator;
     }
 
     return this;
@@ -119,24 +117,9 @@ export class Builder implements BuilderType<Type> {
     return this;
   }
 
-  public withAccessErrorConstructor<E extends Error>(
-    constructor?: new (e: Error) => E
-  ) {
-    if (constructor) {
-      const CtorFunc = constructor;
-      return this.withAccessErrorMapper(e => {
-        const newErr = new CtorFunc(e);
-        console.log(newErr);
-        return newErr;
-      });
-    }
-
-    return this.withAccessErrorMapper(undefined);
-  }
-
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
-      this.object.settingObjectUnsafely(buildable.deepClonedObject);
+      this.object._object = buildable.deepClonedObject;
 
       return this.withPathSeparator(
         buildable.pathSeparator

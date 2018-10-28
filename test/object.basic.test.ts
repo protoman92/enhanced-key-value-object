@@ -66,7 +66,6 @@ describe('Basic operations should work correctly', () => {
 
     /// Then
     expect(error1).toBeInstanceOf(ErrorSubclass);
-    EKVObject.setDefaultAccessErrorMapper(undefined);
   });
 
   it('Accessing path with thrown error should work correctly', () => {
@@ -80,6 +79,28 @@ describe('Basic operations should work correctly', () => {
 
     /// Then
     expect(accessedObject.isFailure()).toBeTruthy();
+  });
+
+  it('Modifying object - should keep custom properties via clone', () => {
+    const ekvObject = EKVObject.builder()
+      .withPathSeparator('/')
+      .withAccessErrorMapper(e => e)
+      .build();
+
+    /// When
+    let nextObject = ekvObject.updatingValue('1.2.3', [1, 2, 3]);
+    nextObject = ekvObject.removingArrayIndex('1.2.3', 1);
+    nextObject = ekvObject.upsertingInArray('1.2.3', 10);
+    nextObject = ekvObject.copyingValue('1.2.3', '4.5.6');
+    nextObject = ekvObject.movingValue('4.5.6', '7.8.9');
+    nextObject = ekvObject.swappingValue('7.8.9', '4.5.6');
+    nextObject = ekvObject.removingValue('4.5.6');
+    nextObject = ekvObject.emptying();
+    nextObject = ekvObject.updatingValuesWithFullPaths({ abc: 123 });
+
+    /// Then
+    expect(nextObject.pathSeparator).toEqual(ekvObject.pathSeparator);
+    expect(nextObject.accessErrorMapper).toBeDefined();
   });
 
   it('Emptying object should work correctly', () => {

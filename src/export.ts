@@ -9,7 +9,7 @@ export {
   builder,
   empty,
   just,
-  setDefaultAccessMode,
   setDefaultAccessErrorConstructor,
-  setDefaultAccessErrorMapper
+  setDefaultAccessErrorMapper,
+  setDefaultAccessMode
 } from './object+utility';

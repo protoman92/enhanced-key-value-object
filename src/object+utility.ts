@@ -20,14 +20,9 @@ export function setDefaultAccessErrorMapper(mapper?: (e: Error) => Error) {
 }
 
 export function setDefaultAccessErrorConstructor(
-  ctor?: new (e: Error) => Error
+  ErrorCtor?: new (e: Error) => Error
 ) {
-  if (ctor) {
-    const Constructor = ctor;
-    setDefaultAccessErrorMapper(e => new Constructor(e));
-  } else {
-    setDefaultAccessErrorMapper(undefined);
-  }
+  setDefaultAccessErrorMapper(ErrorCtor && (e => new ErrorCtor(e)));
 }
 
 export function getAccessModeOrFallback(mode?: typeof defaultAccessMode) {

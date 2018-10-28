@@ -1,6 +1,5 @@
 import { JSObject, Never, Objects, Try, TryResult } from 'javascriptutilities';
 import { Impl, Type } from './object';
-import { empty } from './object+utility';
 import { DeleteKey, DELETE_KEY } from './param';
 import { shallowClone, shallowCloneObject } from './util';
 export type EKVMapFn = (value: Try<unknown>) => TryResult<unknown>;
@@ -84,13 +83,6 @@ declare module './object' {
 
   export interface Impl extends Type {
     /**
-     * Clone with a new object.
-     * @param {JSObject<unknown>} object A JSObject instance.
-     * @returns {Impl} An Impl instance.
-     */
-    _cloneWithNewObject(object: JSObject<unknown>): Impl;
-
-    /**
      * Map value at a certain path by modifying an external object. This method
      * should not be used anywhere else except internally.
      * @param {JSObject<unknown>} object The object to modify.
@@ -145,12 +137,6 @@ declare module './object' {
   }
 }
 
-Impl.prototype._cloneWithNewObject = function(object) {
-  return new Impl()
-    .copyingPropertiesUnsafely(this)
-    .settingObjectUnsafely(object);
-};
-
 Impl.prototype._mappingValue = function(object, path, mapFn) {
   try {
     const subpaths = path.split(this.pathSeparator);
@@ -193,7 +179,7 @@ Impl.prototype._mappingValue = function(object, path, mapFn) {
       currentResult = interValue;
     }
 
-    return this._cloneWithNewObject(objectCopy);
+    return this._cloneWithNewObjectUnsafely(objectCopy);
   } catch (e) {
     return this.cloneBuilder().build() as Impl;
   }
@@ -217,7 +203,7 @@ Impl.prototype._movingValue = function(object, src, dest) {
 };
 
 Impl.prototype.emptying = function(): Type {
-  return empty();
+  return this._cloneWithNewObjectUnsafely({});
 };
 
 Impl.prototype.mappingValue = function(path, mapFn) {
@@ -239,10 +225,7 @@ Impl.prototype.updatingValues = function(object) {
     const currentObject = this;
     const clonedTarget = JSON.parse(JSON.stringify(object));
     const newObject = Object.assign(currentObject, clonedTarget);
-
-    return new Impl()
-      .copyingPropertiesUnsafely(this)
-      .settingObjectUnsafely(newObject);
+    return this._cloneWithNewObjectUnsafely(newObject);
   } catch (e) {
     return this.cloneBuilder().build();
   }
