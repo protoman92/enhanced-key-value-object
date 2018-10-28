@@ -60,24 +60,35 @@ declare module './object' {
 }
 
 Impl.prototype._valueAtNode = function(object, path) {
-  const subpaths = path.split(this.pathSeparator);
-  let currentResult: any = object;
+  const _accessValue = () => {
+    const subpaths = path.split(this.pathSeparator);
+    let currentResult: any = object;
 
-  for (const subpath of subpaths) {
-    try {
-      const intermediateResult = currentResult[subpath];
+    for (const subpath of subpaths) {
+      try {
+        const intermediateResult = currentResult[subpath];
 
-      if (intermediateResult !== undefined && intermediateResult !== null) {
-        currentResult = intermediateResult;
-      } else {
-        return Try.failure(`No value found at ${path}`);
+        if (intermediateResult !== undefined && intermediateResult !== null) {
+          currentResult = intermediateResult;
+        } else {
+          return Try.failure(`No value found at ${path}`);
+        }
+      } catch (e) {
+        return Try.failure(e);
       }
-    } catch (e) {
-      return Try.failure(e);
     }
+
+    return Try.success(currentResult);
+  };
+
+  const result = _accessValue();
+
+  if (this.accessErrorMapper) {
+    const accessErrorMapper = this.accessErrorMapper;
+    return result.mapError(e => accessErrorMapper(e));
   }
 
-  return Try.success(currentResult);
+  return result;
 };
 
 Impl.prototype.valueAtNode = function(path) {

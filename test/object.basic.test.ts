@@ -33,7 +33,7 @@ describe('Basic operations should work correctly', () => {
   });
 
   it('Accessing path with value should work correctly', () => {
-    /// Then
+    /// Setup && When && Then
     expect(ekvObject.numberAtNode('a.a1_1.a2_3').value).toBe(3);
     expect(ekvObject.booleanAtNode('a.a1_1.a2_3').value).toBeUndefined();
     expect(ekvObject.stringAtNode('a.a1_1.a2_3').value).toBeUndefined();
@@ -42,6 +42,31 @@ describe('Basic operations should work correctly', () => {
     expect(ekvObject.numberAtNode('c').value).toBeUndefined();
     expect(ekvObject.stringAtNode('d').value).toBe('d');
     expect(ekvObject.objectAtNode('a').value).toBeDefined();
+  });
+
+  it('Accessing invalid path with error mapper - should map error', () => {
+    /// Setup
+    class ErrorSubclass implements Error {
+      public constructor(private readonly e: Error) {}
+
+      public get name() {
+        return this.e.name;
+      }
+
+      public get message() {
+        return this.e.message;
+      }
+    }
+
+    EKVObject.setDefaultAccessErrorConstructor(ErrorSubclass);
+    const ekvObject = EKVObject.just({});
+
+    /// When
+    const error1 = ekvObject.valueAtNode('a.b.c').error;
+
+    /// Then
+    expect(error1).toBeInstanceOf(ErrorSubclass);
+    EKVObject.setDefaultAccessErrorMapper(undefined);
   });
 
   it('Accessing path with thrown error should work correctly', () => {

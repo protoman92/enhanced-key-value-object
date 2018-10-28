@@ -1,4 +1,4 @@
-import { Never } from 'javascriptutilities';
+import { Never, Undefined } from 'javascriptutilities';
 import {
   Builder,
   EKVObjectType,
@@ -9,9 +9,25 @@ import {
 } from './object';
 
 let defaultAccessMode: 'safe' | 'unsafe' = 'safe';
+let defaultErrorMapper: Undefined<(e: Error) => Error> = undefined;
 
 export function setDefaultAccessMode(mode: 'safe' | 'unsafe') {
   defaultAccessMode = mode;
+}
+
+export function setDefaultAccessErrorMapper(mapper?: (e: Error) => Error) {
+  defaultErrorMapper = mapper;
+}
+
+export function setDefaultAccessErrorConstructor(
+  ctor?: new (e: Error) => Error
+) {
+  if (ctor) {
+    const Constructor = ctor;
+    setDefaultAccessErrorMapper(e => new Constructor(e));
+  } else {
+    setDefaultAccessErrorMapper(undefined);
+  }
 }
 
 export function getAccessModeOrFallback(mode?: 'safe' | 'unsafe') {
@@ -59,11 +75,13 @@ export function just(
       return builder()
         .withObject(innerObject, getAccessModeOrFallback(mode))
         .withPathSeparator(pathSeparator)
+        .withAccessErrorMapper(defaultErrorMapper)
         .build();
     }
 
     return builder()
       .withObject(object, getAccessModeOrFallback(mode))
+      .withAccessErrorMapper(defaultErrorMapper)
       .build();
   }
 

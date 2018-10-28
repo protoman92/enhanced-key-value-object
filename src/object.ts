@@ -11,12 +11,13 @@ export interface Type extends BuildableType<Builder> {
    */
   readonly deepClonedObject: JSObject<unknown>;
   readonly pathSeparator: string;
+  readonly accessErrorMapper?: (error: Error) => Error;
 }
 
 export class Impl implements Type {
   public _object: JSObject<unknown>;
   public _pathSeparator: string;
-  public _errorAccessMapper?: (error: Error) => Error;
+  public _accessErrorMapper?: (error: Error) => Error;
 
   public constructor() {
     this._object = {};
@@ -41,6 +42,10 @@ export class Impl implements Type {
 
   public get pathSeparator(): string {
     return this._pathSeparator;
+  }
+
+  public get accessErrorMapper() {
+    return this._accessErrorMapper;
   }
 
   public builder(): Builder {
@@ -109,10 +114,33 @@ export class Builder implements BuilderType<Type> {
     return this;
   }
 
+  public withAccessErrorMapper(mapper?: (e: Error) => Error) {
+    this.object._accessErrorMapper = mapper;
+    return this;
+  }
+
+  public withAccessErrorConstructor<E extends Error>(
+    constructor?: new (e: Error) => E
+  ) {
+    if (constructor) {
+      const CtorFunc = constructor;
+      return this.withAccessErrorMapper(e => {
+        const newErr = new CtorFunc(e);
+        console.log(newErr);
+        return newErr;
+      });
+    }
+
+    return this.withAccessErrorMapper(undefined);
+  }
+
   public withBuildable(buildable: Type) {
     if (buildable !== undefined && buildable !== null) {
       this.object.settingObjectUnsafely(buildable.deepClonedObject);
-      return this.withPathSeparator(buildable.pathSeparator);
+
+      return this.withPathSeparator(
+        buildable.pathSeparator
+      ).withAccessErrorMapper(buildable.accessErrorMapper);
     }
 
     return this;

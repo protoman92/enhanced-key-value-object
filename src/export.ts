@@ -5,4 +5,11 @@ import './object+compare';
 import './object+equal';
 import './object+modify';
 export { Builder, Type } from './object';
-export { builder, empty, just, setDefaultAccessMode } from './object+utility';
+export {
+  builder,
+  empty,
+  just,
+  setDefaultAccessMode,
+  setDefaultAccessErrorConstructor,
+  setDefaultAccessErrorMapper
+} from './object+utility';
