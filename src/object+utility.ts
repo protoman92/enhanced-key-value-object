@@ -9,14 +9,14 @@ import {
 } from './object';
 
 let defaultAccessMode: 'safe' | 'unsafe' = 'safe';
-let defaultErrorMapper: Undefined<(e: Error) => Error> = undefined;
+let defaultAccessErrorMapper: Undefined<(e: Error) => Error> = undefined;
 
-export function setDefaultAccessMode(mode: 'safe' | 'unsafe') {
+export function setDefaultAccessMode(mode: typeof defaultAccessMode) {
   defaultAccessMode = mode;
 }
 
 export function setDefaultAccessErrorMapper(mapper?: (e: Error) => Error) {
-  defaultErrorMapper = mapper;
+  defaultAccessErrorMapper = mapper;
 }
 
 export function setDefaultAccessErrorConstructor(
@@ -30,7 +30,7 @@ export function setDefaultAccessErrorConstructor(
   }
 }
 
-export function getAccessModeOrFallback(mode?: 'safe' | 'unsafe') {
+export function getAccessModeOrFallback(mode?: typeof defaultAccessMode) {
   return mode || defaultAccessMode;
 }
 
@@ -50,20 +50,11 @@ export function empty(): Type {
   return builder().build();
 }
 
-/**
- * Create an enhanced key-value object with an object.
- * @param {Never<EKVObjectType>} object An EKVObjectType instance.
- * @param {('safe' | 'unsafe')} [mode] If safe mode, all objects are deep cloned
- * before they are set, and otherwise for unsafe mode.
- * @returns {Type} A Type instance.
- */
-export function just(
+function _justBuilder(
   object: Never<EKVObjectType>,
-  mode?: 'safe' | 'unsafe'
-): Type {
+  { mode }: Readonly<{ mode?: typeof defaultAccessMode }> = { mode: 'safe' }
+) {
   if (object !== undefined && object !== null) {
-    if (object instanceof Impl) return object;
-
     const innerObject = (object as any)[objectKey];
     const pathSeparator = (object as any)[pathSeparatorKey];
 
@@ -74,16 +65,31 @@ export function just(
     ) {
       return builder()
         .withObject(innerObject, getAccessModeOrFallback(mode))
-        .withPathSeparator(pathSeparator)
-        .withAccessErrorMapper(defaultErrorMapper)
-        .build();
+        .withPathSeparator(pathSeparator);
     }
 
-    return builder()
-      .withObject(object, getAccessModeOrFallback(mode))
-      .withAccessErrorMapper(defaultErrorMapper)
-      .build();
+    return builder().withObject(object, getAccessModeOrFallback(mode));
   }
 
-  return empty();
+  return builder();
+}
+
+/**
+ * Create an enhanced key-value object with an object.
+ * @param {Never<EKVObjectType>} object An EKVObjectType instance.
+ */
+export function just(
+  object: Never<EKVObjectType>,
+  options?: Readonly<{
+    mode?: typeof defaultAccessMode;
+    accessErrorMapper?: (e: Error) => Error;
+  }>
+): Type {
+  if (object instanceof Impl) return object;
+
+  return _justBuilder(object, options)
+    .withAccessErrorMapper(
+      (options && options.accessErrorMapper) || defaultAccessErrorMapper
+    )
+    .build();
 }

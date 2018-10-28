@@ -38,7 +38,7 @@ describe('Utilities should be implemented correctly', () => {
     );
     expect(EKVObject.just(undefined).deepClonedObject).toEqual({});
 
-    const unsafeClone = EKVObject.just(possibleObject3, 'unsafe');
+    const unsafeClone = EKVObject.just(possibleObject3, { mode: 'unsafe' });
     (possibleObject3[objectKey] as any).a = 2;
     expect(unsafeClone.valueAtNode('a').value).toEqual(2);
   });
@@ -47,7 +47,7 @@ describe('Utilities should be implemented correctly', () => {
     /// Setup
     const ekvObject = EKVObject.just(
       { a: { b: undefined }, b: null },
-      'unsafe'
+      { mode: 'unsafe' }
     );
 
     /// When
