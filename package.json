@@ -11,7 +11,7 @@
     "lint": "./node_modules/tslint/bin/tslint '{src,test}/**/*'",
     "test": "jest --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "prepublish": "rm -rf ./dist && tsc"
+    "prepublishOnly": "rm -rf ./dist && tsc"
   },
   "repository": {
     "type": "git",

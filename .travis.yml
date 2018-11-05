@@ -1,12 +1,18 @@
-language: nodejs
-
-before_script:
-  - npm run setup 
-  - npm run build
-
-script:
-  - npm run test
-
-after_success:
-  - npm run coveralls
-  - npm pack
+{
+  "os": "linux",
+  "dist": "trusty",
+  "group": "stable",
+  "script": [
+    "npm run test"
+  ],
+  "node_js": "8",
+  "language": "node_js",
+  "after_success": [
+    "npm run coveralls",
+    "npm pack"
+  ],
+  "before_script": [
+    "npm run setup",
+    "npm run build"
+  ]
+}
